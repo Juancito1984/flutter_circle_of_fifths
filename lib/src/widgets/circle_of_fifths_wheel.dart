@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_theme.dart';
 
-/// Interactive Circle of Fifths wheel widget.
-/// Rotates the selected key to the 12:00 position and highlights its 7 diatonic degrees.
+/// Interactive Circle of Fifths wheel widget with gesture dragging support
+/// and harmonic progression overlay badges.
 class CircleOfFifthsWheelWidget extends StatefulWidget {
   final int selectedIndex;
   final bool isMinorMode;
   final Function(int index, bool isMinor) onKeySelected;
   final CircleOfFifthsTheme customTheme;
+  final HarmonicProgression? activeProgression;
 
   const CircleOfFifthsWheelWidget({
     super.key,
@@ -17,6 +18,7 @@ class CircleOfFifthsWheelWidget extends StatefulWidget {
     required this.isMinorMode,
     required this.onKeySelected,
     this.customTheme = const CircleOfFifthsTheme(),
+    this.activeProgression,
   });
 
   @override
@@ -26,6 +28,8 @@ class CircleOfFifthsWheelWidget extends StatefulWidget {
 
 class _CircleOfFifthsWheelWidgetState
     extends State<CircleOfFifthsWheelWidget> {
+  double _dragRotation = 0.0;
+
   void _handleTap(Offset localPosition, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final dx = localPosition.dx - center.dx;
@@ -60,6 +64,39 @@ class _CircleOfFifthsWheelWidgetState
     }
   }
 
+  void _handlePanUpdate(DragUpdateDetails details, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final pos = details.localPosition;
+
+    final angleBefore = math.atan2(
+      pos.dy - details.delta.dy - center.dy,
+      pos.dx - details.delta.dx - center.dx,
+    );
+    final angleAfter = math.atan2(
+      pos.dy - center.dy,
+      pos.dx - center.dx,
+    );
+
+    double deltaAngle = angleAfter - angleBefore;
+    if (deltaAngle > math.pi) deltaAngle -= 2 * math.pi;
+    if (deltaAngle < -math.pi) deltaAngle += 2 * math.pi;
+
+    setState(() {
+      _dragRotation += deltaAngle;
+    });
+
+    final sectorAngle = (2 * math.pi) / 12;
+    if (_dragRotation.abs() >= sectorAngle) {
+      final steps = (_dragRotation / sectorAngle).round();
+      if (steps != 0) {
+        int newIndex = (widget.selectedIndex - steps) % 12;
+        if (newIndex < 0) newIndex += 12;
+        _dragRotation -= steps * sectorAngle;
+        widget.onKeySelected(newIndex, widget.isMinorMode);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -71,6 +108,7 @@ class _CircleOfFifthsWheelWidgetState
           final size = Size(constraints.maxWidth, constraints.maxHeight);
           return GestureDetector(
             onTapDown: (details) => _handleTap(details.localPosition, size),
+            onPanUpdate: (details) => _handlePanUpdate(details, size),
             child: CustomPaint(
               size: size,
               painter: _CircleOfFifthsPainter(
@@ -78,6 +116,7 @@ class _CircleOfFifthsWheelWidgetState
                 isMinorMode: widget.isMinorMode,
                 colorScheme: colorScheme,
                 customTheme: widget.customTheme,
+                activeProgression: widget.activeProgression,
               ),
             ),
           );
@@ -92,12 +131,14 @@ class _CircleOfFifthsPainter extends CustomPainter {
   final bool isMinorMode;
   final ColorScheme colorScheme;
   final CircleOfFifthsTheme customTheme;
+  final HarmonicProgression? activeProgression;
 
   _CircleOfFifthsPainter({
     required this.selectedIndex,
     required this.isMinorMode,
     required this.colorScheme,
     required this.customTheme,
+    this.activeProgression,
   });
 
   @override
@@ -127,7 +168,7 @@ class _CircleOfFifthsPainter extends CustomPainter {
     final Color disminuidoColor = customTheme.diminishedColor ??
         (isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0));
 
-    // Draw the 12 sectors rotated so selectedIndex is at 12:00
+    // Draw the 12 sectors
     for (int visIndex = 0; visIndex < 12; visIndex++) {
       final actualIndex = (visIndex + selectedIndex) % 12;
       final item = CircleOfFifthsModel.defaultKeys[actualIndex];
@@ -140,7 +181,6 @@ class _CircleOfFifthsPainter extends CustomPainter {
       Color textColorOnInner = colorScheme.onSurface;
 
       if (!isMinorMode) {
-        // MAJOR MODE
         if (visIndex == 0) {
           outerSectorColor = tonicaColor;
           textColorOnOuter = isDark ? Colors.black : Colors.white;
@@ -161,7 +201,6 @@ class _CircleOfFifthsPainter extends CustomPainter {
           textColorOnInner = Colors.white;
         }
       } else {
-        // MINOR MODE
         if (visIndex == 0) {
           innerSectorColor = tonicaColor;
           textColorOnInner = isDark ? Colors.black : Colors.white;
@@ -285,6 +324,40 @@ class _CircleOfFifthsPainter extends CustomPainter {
       );
     }
 
+    // --- HARMONIC PROGRESSION OVERLAY BADGES ---
+    if (activeProgression != null) {
+      final prog = activeProgression!;
+      for (int i = 0; i < prog.relativeSectors.length; i++) {
+        final relSector = prog.relativeSectors[i];
+        final stepNum = prog.stepNumbers[i];
+        final angle = rotationOffset + (relSector * sectorAngle) + (sectorAngle / 2);
+
+        final badgeRadius = radius * 0.70;
+        final badgeCenter = Offset(
+          center.dx + badgeRadius * math.cos(angle),
+          center.dy + badgeRadius * math.sin(angle),
+        );
+
+        // Draw badge circle
+        final badgePaint = Paint()
+          ..color = colorScheme.primary
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(badgeCenter, 11, badgePaint);
+
+        // Draw badge number text
+        _drawText(
+          canvas,
+          '$stepNum',
+          badgeCenter,
+          TextStyle(
+            color: colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
+          ),
+        );
+      }
+    }
+
     // --- CENTER CORE WITH BRAND ---
     final coreRadius = radius * 0.25;
     paint.color = colorScheme.surfaceContainerHigh;
@@ -332,6 +405,7 @@ class _CircleOfFifthsPainter extends CustomPainter {
     return oldDelegate.selectedIndex != selectedIndex ||
         oldDelegate.isMinorMode != isMinorMode ||
         oldDelegate.colorScheme != colorScheme ||
-        oldDelegate.customTheme != customTheme;
+        oldDelegate.customTheme != customTheme ||
+        oldDelegate.activeProgression != activeProgression;
   }
 }

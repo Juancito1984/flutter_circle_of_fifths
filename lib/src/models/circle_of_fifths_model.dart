@@ -160,3 +160,48 @@ class CircleOfFifthsModel {
     ),
   ];
 }
+
+/// Represents a famous harmonic progression (e.g. I - V - vi - IV).
+class HarmonicProgression {
+  final String id;
+  final String name;
+  final String formula;
+
+  /// Sequence of sector visual indices relative to tonic (0 = I/i, 1 = V/v, 11 = IV/iv)
+  final List<int> relativeSectors;
+
+  /// List of step badges corresponding to relativeSectors
+  final List<int> stepNumbers;
+
+  const HarmonicProgression({
+    required this.id,
+    required this.name,
+    required this.formula,
+    required this.relativeSectors,
+    required this.stepNumbers,
+  });
+
+  static const List<HarmonicProgression> defaultProgressions = [
+    HarmonicProgression(
+      id: 'pop_worship',
+      name: 'Worship / Pop',
+      formula: 'I - V - vi - IV',
+      relativeSectors: [0, 1, 0, 11],
+      stepNumbers: [1, 2, 3, 4],
+    ),
+    HarmonicProgression(
+      id: 'andalusian',
+      name: 'Andalusian Cadence',
+      formula: 'i - VII - VI - V',
+      relativeSectors: [0, 1, 11, 1],
+      stepNumbers: [1, 2, 3, 4],
+    ),
+    HarmonicProgression(
+      id: 'jazz_two_five_one',
+      name: 'Jazz / Gospel',
+      formula: 'ii - V - I',
+      relativeSectors: [11, 1, 0],
+      stepNumbers: [1, 2, 3],
+    ),
+  ];
+}

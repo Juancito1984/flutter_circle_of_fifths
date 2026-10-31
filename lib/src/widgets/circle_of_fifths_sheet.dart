@@ -5,18 +5,28 @@ import 'circle_of_fifths_wheel.dart';
 import 'scale_detail_card.dart';
 
 /// Ready-to-use Draggable Modal BottomSheet for displaying the Circle of Fifths.
+/// Supports localized title and tab labels via optional parameters, and harmonic progression highlights.
 class CircleOfFifthsSheet extends StatefulWidget {
   final CircleOfFifthsTheme customTheme;
+  final String? title;
+  final String? interactiveWheelLabel;
+  final String? summaryViewLabel;
 
   const CircleOfFifthsSheet({
     super.key,
     this.customTheme = const CircleOfFifthsTheme(),
+    this.title,
+    this.interactiveWheelLabel,
+    this.summaryViewLabel,
   });
 
   /// Static helper to display the sheet easily from any BuildContext.
   static void show(
     BuildContext context, {
     CircleOfFifthsTheme customTheme = const CircleOfFifthsTheme(),
+    String? title,
+    String? interactiveWheelLabel,
+    String? summaryViewLabel,
   }) {
     showModalBottomSheet(
       context: context,
@@ -25,7 +35,12 @@ class CircleOfFifthsSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (context) => CircleOfFifthsSheet(customTheme: customTheme),
+      builder: (context) => CircleOfFifthsSheet(
+        customTheme: customTheme,
+        title: title,
+        interactiveWheelLabel: interactiveWheelLabel,
+        summaryViewLabel: summaryViewLabel,
+      ),
     );
   }
 
@@ -37,12 +52,17 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
   int _selectedView = 0; // 0: Interactive Wheel, 1: Summary Grid
   int _selectedIndex = 0; // Selected Key Index (0 = 'C')
   bool _isMinorMode = false;
+  HarmonicProgression? _activeProgression;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedIndex];
+
+    final displayTitle = widget.title ?? 'Circle of Fifths';
+    final wheelLabel = widget.interactiveWheelLabel ?? 'Interactive Wheel';
+    final summaryLabel = widget.summaryViewLabel ?? 'Summary View';
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -78,7 +98,7 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Circle of Fifths',
+                    displayTitle,
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -90,16 +110,16 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
 
               // View Selector (SegmentedButton)
               SegmentedButton<int>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: 0,
-                    label: Text('Interactive Wheel'),
-                    icon: Icon(Icons.incomplete_circle_rounded),
+                    label: Text(wheelLabel),
+                    icon: const Icon(Icons.incomplete_circle_rounded),
                   ),
                   ButtonSegment(
                     value: 1,
-                    label: Text('Summary View'),
-                    icon: Icon(Icons.grid_view_rounded),
+                    label: Text(summaryLabel),
+                    icon: const Icon(Icons.grid_view_rounded),
                   ),
                 ],
                 selected: {_selectedView},
@@ -109,14 +129,50 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                   });
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // VIEW 1: INTERACTIVE WHEEL
               if (_selectedView == 0) ...[
+                // Harmonic Progression Selector Chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      FilterChip(
+                        selected: _activeProgression == null,
+                        label: const Text('None'),
+                        onSelected: (_) {
+                          setState(() {
+                            _activeProgression = null;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ...HarmonicProgression.defaultProgressions.map((prog) {
+                        final isSelected = _activeProgression?.id == prog.id;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            selected: isSelected,
+                            label: Text('${prog.name} (${prog.formula})'),
+                            onSelected: (selected) {
+                              setState(() {
+                                _activeProgression = selected ? prog : null;
+                              });
+                            },
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
                 CircleOfFifthsWheelWidget(
                   selectedIndex: _selectedIndex,
                   isMinorMode: _isMinorMode,
                   customTheme: widget.customTheme,
+                  activeProgression: _activeProgression,
                   onKeySelected: (index, isMinor) {
                     setState(() {
                       _selectedIndex = index;
