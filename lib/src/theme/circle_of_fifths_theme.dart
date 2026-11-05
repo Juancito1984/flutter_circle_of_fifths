@@ -17,6 +17,7 @@ class CircleOfFifthsTheme {
   /// Optional brand text displayed in the center of the wheel (e.g. "NyK").
   final String centerLabel;
 
+  /// Creates a [CircleOfFifthsTheme] instance for wheel color and logo customization.
   const CircleOfFifthsTheme({
     this.tonicColor,
     this.subdominantDominantColor,

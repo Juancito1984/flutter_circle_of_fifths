@@ -24,7 +24,8 @@ void main() {
   });
 
   group('Widget Tests', () {
-    testWidgets('CircleOfFifthsWheelWidget renders without errors', (tester) async {
+    testWidgets('CircleOfFifthsWheelWidget renders without errors',
+        (tester) async {
       int selectedIndex = 0;
       bool isMinorMode = false;
 
@@ -46,7 +47,8 @@ void main() {
       expect(find.byType(CircleOfFifthsWheelWidget), findsOneWidget);
     });
 
-    testWidgets('ScaleDetailCard renders scale details for C Major', (tester) async {
+    testWidgets('ScaleDetailCard renders scale details for C Major',
+        (tester) async {
       final cMajor = CircleOfFifthsModel.defaultKeys[0];
 
       await tester.pumpWidget(
@@ -64,7 +66,8 @@ void main() {
       expect(find.byType(ScaleDetailCard), findsOneWidget);
     });
 
-    testWidgets('CircleOfFifthsSheet displays interactive wheel and title', (tester) async {
+    testWidgets('CircleOfFifthsSheet displays interactive wheel and title',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

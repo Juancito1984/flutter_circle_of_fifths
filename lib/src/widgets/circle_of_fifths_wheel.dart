@@ -6,11 +6,19 @@ import '../theme/circle_of_fifths_theme.dart';
 /// Interactive Circle of Fifths wheel widget.
 /// Rotates the selected key to the 12:00 position and highlights its 7 diatonic degrees.
 class CircleOfFifthsWheelWidget extends StatefulWidget {
+  /// Index of the currently selected key (0 = 'C', 1 = 'G', etc.).
   final int selectedIndex;
+
+  /// Whether Minor mode (Relative Minor) is selected instead of Major mode.
   final bool isMinorMode;
+
+  /// Callback triggered when a key sector or mode ring is tapped.
   final Function(int index, bool isMinor) onKeySelected;
+
+  /// Custom theme configuration for colors and center brand label.
   final CircleOfFifthsTheme customTheme;
 
+  /// Creates a [CircleOfFifthsWheelWidget] canvas wheel widget.
   const CircleOfFifthsWheelWidget({
     super.key,
     required this.selectedIndex,
@@ -24,8 +32,7 @@ class CircleOfFifthsWheelWidget extends StatefulWidget {
       _CircleOfFifthsWheelWidgetState();
 }
 
-class _CircleOfFifthsWheelWidgetState
-    extends State<CircleOfFifthsWheelWidget> {
+class _CircleOfFifthsWheelWidgetState extends State<CircleOfFifthsWheelWidget> {
   void _handleTap(Offset localPosition, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final dx = localPosition.dx - center.dx;
@@ -120,8 +127,9 @@ class _CircleOfFifthsPainter extends CustomPainter {
     // Color palette with fallback to Theme defaults
     final Color tonicaColor = customTheme.tonicColor ??
         (isDark ? const Color(0xFFFFB74D) : const Color(0xFFF57C00));
-    final Color gradosCuartoQuintoColor = customTheme.subdominantDominantColor ??
-        (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828));
+    final Color gradosCuartoQuintoColor =
+        customTheme.subdominantDominantColor ??
+            (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828));
     final Color acordesMenoresColor = customTheme.minorChordsColor ??
         (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32));
     final Color disminuidoColor = customTheme.diminishedColor ??

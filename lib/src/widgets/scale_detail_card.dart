@@ -3,9 +3,13 @@ import '../models/circle_of_fifths_model.dart';
 
 /// Card widget showing the scale notes, degree numbers (1-8), and halftone interval formulas.
 class ScaleDetailCard extends StatelessWidget {
+  /// The [CircleOfFifthsModel] providing notes and diatonic scale data.
   final CircleOfFifthsModel model;
+
+  /// Whether the card displays Major mode or Relative Minor mode scale notes.
   final bool isMinorMode;
 
+  /// Creates a [ScaleDetailCard] widget displaying scale notes and interval formula.
   const ScaleDetailCard({
     super.key,
     required this.model,

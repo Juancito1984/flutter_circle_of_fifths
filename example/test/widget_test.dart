@@ -4,7 +4,8 @@ import 'package:example/main.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 void main() {
-  testWidgets('Demo app loads Circle of Fifths homepage', (WidgetTester tester) async {
+  testWidgets('Demo app loads Circle of Fifths homepage',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
     expect(find.text('Circle of Fifths'), findsWidgets);

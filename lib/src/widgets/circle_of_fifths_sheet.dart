@@ -6,8 +6,10 @@ import 'scale_detail_card.dart';
 
 /// Ready-to-use Draggable Modal BottomSheet for displaying the Circle of Fifths.
 class CircleOfFifthsSheet extends StatefulWidget {
+  /// Custom theme configuration for colors and center brand label.
   final CircleOfFifthsTheme customTheme;
 
+  /// Creates a [CircleOfFifthsSheet] bottom sheet widget.
   const CircleOfFifthsSheet({
     super.key,
     this.customTheme = const CircleOfFifthsTheme(),
@@ -166,7 +168,8 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                           border: Border.all(
                             color: isSelected
                                 ? colorScheme.primary
-                                : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                : colorScheme.outlineVariant
+                                    .withValues(alpha: 0.5),
                           ),
                         ),
                         child: Column(

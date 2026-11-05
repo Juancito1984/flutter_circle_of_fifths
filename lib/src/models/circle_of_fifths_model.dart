@@ -25,6 +25,7 @@ class CircleOfFifthsModel {
   /// Complete 8-note Natural Minor scale
   final List<String> minorScaleNotes;
 
+  /// Creates a [CircleOfFifthsModel] instance representing a musical key position.
   const CircleOfFifthsModel({
     required this.major,
     required this.minor,
