@@ -1,6 +1,6 @@
 # flutter_circle_of_fifths (Español)
 
-Una librería de widgets en Flutter interactiva, personalizable y adaptada a **Material 3** para representar el **Círculo de Quintas**. Soporta modos Mayor y Menor, desglose de escalas diatónicas, adaptación automática a temas claro/oscuro y navegación circular táctil.
+Una suite musical completa, interactiva, personalizable y adaptada a **Material 3** para Flutter que incluye el **Círculo de Quintas, Visor de Canciones con Acordes (ChordPro), Transpositor Armónico, Diagramas de Instrumentos (Guitarra, Ukulele, Piano), Progresiones Armónicas con Análisis Romano, Modos Gregorianos y Síntesis de Audio en Dart Puro**.
 
 [![pub package](https://img.shields.io/pub/v/flutter_circle_of_fifths.svg)](https://pub.dev/packages/flutter_circle_of_fifths)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -26,12 +26,15 @@ Si este paquete te ha sido útil y deseas apoyar su desarrollo y mantenimiento c
 ## 🌟 Características Principales
 
 - 🎡 **Rueda Interactiva de 12 Sectores**: Toca el anillo exterior para tonalidades Mayores o el anillo medio para sus Menores Relativas.
-- 🔄 **Rotación Dinámica a la Posición 12:00**: Centra suavemente la tonalidad activa en la parte superior.
-- 🎨 **Adaptativo a Material 3**: Hereda de forma nativa la paleta de colores claro y oscuro de la aplicación utilizando la API moderna `.withValues(alpha: ...)`.
-- 🎵 **Desglose de Escalas Diatónicas**: Muestra las fórmulas de tonos/semitonos de escalas Mayores y Menores Naturales (`2-2-1-2-2-2-1` y `2-1-2-2-1-2-2`), números de grado (1-8) y variaciones de acordes.
-- 🌈 **Destacado Semántico de Grados**: Colores distintivos para la Tónica ($I / i$), Subdominante ($IV / iv$), Dominante ($V / v$) y Disminuido ($vii^\circ / ii^\circ$).
-- 🏷️ **Personalización de Tema y Logotipo**: Configura un texto de marca en el centro (ej. `'NyK'`) o personaliza los colores mediante `CircleOfFifthsTheme`.
-- 📱 **Modal BottomSheet Listo para Usar**: Se despliega como hoja modal con vista interactiva y vista en cuadrícula resumen mediante una sola línea de código.
+- 🔄 **Rotación Dinámica a las 12:00**: Centra suavemente la tonalidad activa en la parte superior.
+- 📝 **Visor de Canciones con Acordes (`ChordSheetViewer`)**: Formato ChordPro y entre corchetes (`[C]Amazing [F]grace...`). Muestra etiquetas de acordes flotantes sobre las sílabas exactas. Toca cualquier acorde para ver cómo tocarlo.
+- 🎚️ **Motor de Transposición Armónica (`ChordTransposer`)**: Transpone canciones completas por semitonos (`+1` / `-1`) o directamente entre tonalidades del Círculo de Quintas adaptando enarmonías (`#` frente a `b`).
+- 🎸 **Diagramas de Acordes para Instrumentos**: Mástiles vectoriales con cejillas y dedos para **Guitarra (6 cuerdas)** y **Ukulele (4 cuerdas)**, además de **Teclado de Piano (1 a 3 octavas)** con notas resaltadas.
+- 🎼 **Constructor de Progresiones Armónicas (`ProgressionBuilderWidget`)**: Plantillas estándar (Pop/Rock Axis, Jazz ii-V-I, 12-Bar Blues, Canon de Pachelbel), análisis en números romanos ($I, ii, iii, IV, V, vi, vii^\circ$) y sugerencias de dominantes secundarios.
+- 🎷 **7 Modos Gregorianos y Escalas Avanzadas (`ScaleModesWidget`)**: Jónico, Dórico, Frigio, Lidio, Mixolidio, Eolio y Locrio; más Pentatónicas, Blues, Menor Armónica y Menor Melódica.
+- 🔊 **Síntesis de Audio en Dart Puro (`SimpleAudioSynthesizer`)**: Generación de audio PCM WAV en memoria sin plugins nativos, 100% funcional en las 6 plataformas (Android, iOS, Web, Windows, macOS, Linux).
+- 🎨 **Adaptativo a Material 3**: Hereda de forma nativa la paleta de colores claro y oscuro de la aplicación.
+- 📱 **Modales BottomSheet Listos para Usar**: Se despliegan con una sola línea de código para el Círculo de Quintas y el Inspector de Acordes.
 
 ---
 
@@ -41,7 +44,7 @@ Agrega la dependencia en tu archivo `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.1.1
+  flutter_circle_of_fifths: ^1.2.0
 ```
 
 Ejecuta en la terminal:
@@ -54,7 +57,7 @@ flutter pub get
 
 ## 💻 Ejemplos de Uso
 
-### 1. Desplegar como Modal BottomSheet (Una sola línea)
+### 1. Desplegar el Círculo de Quintas como Modal (Una línea)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -72,21 +75,21 @@ void abrirCirculoDeQuintas(BuildContext context) {
 
 ---
 
-### 2. Widget de Rueda Interactiva Independiente
+### 2. Rueda Interactiva y Tarjeta de Escala Diatónica
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
-class MiPagina extends StatefulWidget {
-  const MiPagina({super.key});
+class PaginaMusical extends StatefulWidget {
+  const PaginaMusical({super.key});
 
   @override
-  State<MiPagina> createState() => _MiPaginaState();
+  State<PaginaMusical> createState() => _PaginaMusicalState();
 }
 
-class _MiPaginaState extends State<MiPagina> {
-  int _selectedIndex = 0; // 0 = 'C' (Do)
+class _PaginaMusicalState extends State<PaginaMusical> {
+  int _selectedIndex = 0; // 0 = 'C'
   bool _isMinorMode = false;
 
   @override
@@ -113,6 +116,7 @@ class _MiPaginaState extends State<MiPagina> {
             ScaleDetailCard(
               model: selectedModel,
               isMinorMode: _isMinorMode,
+              showPianoScale: true, // Muestra el teclado de piano para la escala
             ),
           ],
         ),
@@ -124,9 +128,88 @@ class _MiPaginaState extends State<MiPagina> {
 
 ---
 
-## 🎨 Configuración de Temas Personalizados
+### 3. Visor de Canciones con Acordes y Transposición en Tiempo Real
 
-Puedes personalizar la paleta de colores y el texto central de la marca:
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+const cancionTexto = '''
+{title: Amazing Grace}
+[Verse 1]
+[C]Amazing [F]grace, how [C]sweet the sound
+That [C]saved a [G7]wretch like [C]me!
+''';
+
+Widget visorDeCancion() {
+  return ChordSheetViewer(
+    songText: cancionTexto,
+    originalKey: 'C',
+    targetKey: 'G', // Transpone automáticamente a Sol Mayor
+    showDiagramModalOnTap: true, // Abre modal con Guitarra/Ukulele/Piano al pulsar un acorde
+  );
+}
+```
+
+---
+
+### 4. Diagramas de Acordes para Instrumentos (Guitarra, Ukulele, Piano)
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+// Abre el modal inspector para cualquier acorde:
+void inspeccionarAcorde(BuildContext context, String acorde) {
+  ChordInspectorSheet.show(context, chordSymbol: acorde);
+}
+
+// O inserta los diagramas directamente en tu UI:
+Widget construirDiagramas() {
+  final info = ChordTransposer.parseChord('G7');
+  return Column(
+    children: [
+      FretboardWidget(voicing: info.guitarVoicing, chordTitle: 'G7 (Guitarra)'),
+      FretboardWidget(voicing: info.ukuleleVoicing, chordTitle: 'G7 (Ukulele)'),
+      PianoKeybedWidget(highlightedNotes: info.notes, rootNote: info.root),
+    ],
+  );
+}
+```
+
+---
+
+### 5. Constructor de Progresiones y Análisis en Números Romanos
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+Widget constructorProgresion() {
+  return const ProgressionBuilderWidget(
+    activeKey: 'C',
+  );
+}
+```
+
+---
+
+### 6. Modos Gregorianos y Escalas Avanzadas
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+Widget exploradorModos() {
+  return const ScaleModesWidget(
+    rootNote: 'D', // Explora Dórico, Frigio, Lidio, Blues, etc.
+  );
+}
+```
+
+---
+
+## 🎨 Configuración de Tema Personalizado
 
 ```dart
 CircleOfFifthsTheme(
@@ -140,24 +223,6 @@ CircleOfFifthsTheme(
 
 ---
 
-## 📂 Estructura del Proyecto
-
-```
-lib/
-├── flutter_circle_of_fifths.dart       # Exportaciones principales del paquete
-└── src/
-    ├── models/
-    │   └── circle_of_fifths_model.dart # Modelo teórico musical y 12 armaduras de clave
-    ├── theme/
-    │   └── circle_of_fifths_theme.dart # Paleta de colores y etiquetas de marca
-    └── widgets/
-        ├── circle_of_fifths_sheet.dart # Modal Sheet arrastrable con vista interactiva y resumen
-        ├── circle_of_fifths_wheel.dart # Widget Canvas interativo de la rueda
-        └── scale_detail_card.dart     # Tarjeta de desglose de escala diatónica
-```
-
----
-
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está licenciado bajo la Licencia MIT - consulta el archivo [LICENSE](LICENSE) para más detalles.

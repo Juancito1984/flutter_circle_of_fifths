@@ -1,6 +1,6 @@
 # flutter_circle_of_fifths (English)
 
-An interactive, customizable, Material 3 **Circle of Fifths** widget library for Flutter. Supports Major and Minor modes, diatonic scale breakdown, dark/light theme adaptation, and touch-based circular navigation.
+A comprehensive, interactive, customizable Material 3 **Circle of Fifths, Chord Sheet Viewer, and Music Theory Suite** for Flutter. Supports Major and Minor modes, diatonic scale breakdown, song transposition (ChordPro), instrument chord diagrams (Guitar, Ukulele, Piano), harmonic progressions with Roman numeral analysis, Gregorian church modes, and pure Dart audio synthesis.
 
 [![pub package](https://img.shields.io/pub/v/flutter_circle_of_fifths.svg)](https://pub.dev/packages/flutter_circle_of_fifths)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -25,13 +25,16 @@ Your support is greatly appreciated to keep this project 100% free, open-source,
 
 ## 🌟 Features
 
-- 🎡 **Interactive 12-Sector Wheel**: Tap outer ring for Major keys or middle ring for Relative Minor keys.
-- 🔄 **Dynamic 12:00 Rotation**: Smoothly centers the active key at top position.
-- 🎨 **Material 3 Theme Adaptive**: Automatically inherits application Light & Dark theme colors using modern `.withValues(alpha: ...)` API.
-- 🎵 **Diatonic Scale Breakdown**: Shows Major and Natural Minor scale formulas (`2-2-1-2-2-2-1` and `2-1-2-2-1-2-2`), note degree numbers (1-8), and chord variations.
-- 🌈 **Degree Highlight Colors**: Distinct semantic highlights for Tonic ($I / i$), Subdominant ($IV / iv$), Dominant ($V / v$), and Diminished ($vii^\circ / ii^\circ$).
-- 🏷️ **Customizable Theme & Logo**: Set custom brand text (e.g. `'NyK'`) or degree colors via `CircleOfFifthsTheme`.
-- 📱 **Modal BottomSheet Ready**: Display as a bottom sheet with interactive wheel and summary grid modes in a single function call.
+- 🎡 **Interactive 12-Sector Wheel**: Tap the outer ring for Major keys or the middle ring for Relative Minor keys.
+- 🔄 **Dynamic 12:00 Rotation**: Smoothly centers the selected key at the top of the wheel.
+- 📝 **ChordPro Song Sheet Viewer (`ChordSheetViewer`)**: Aligns interactive chord badges directly over lyrics. Tap any chord to inspect its fingerings.
+- 🎚️ **Harmonic Transposition Engine (`ChordTransposer`)**: Real-time transposition by semitones (`+1` / `-1`) or directly across Circle of Fifths keys with automatic accidental adaptation (`#` vs `b`).
+- 🎸 **Instrument Chord Diagrams**: Vector-drawn diagrams with barres and finger numbers for **Guitar (6 strings)**, **Ukulele (4 strings)**, and **Piano (1–3 octaves)**.
+- 🎼 **Harmonic Progression Builder (`ProgressionBuilderWidget`)**: Popular templates (Pop Axis of Awesome, Jazz ii-V-I, 12-Bar Blues, Canon), Roman numeral analysis ($I, ii, iii, IV, V, vi, vii^\circ$), and secondary dominant suggestions.
+- 🎷 **7 Gregorian Modes & Advanced Scales (`ScaleModesWidget`)**: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian, plus Pentatonics, Blues, Harmonic Minor, and Melodic Minor.
+- 🔊 **Zero-Dependency Audio Synthesis (`SimpleAudioSynthesizer`)**: Pure Dart in-memory PCM WAV synthesis for notes and chords across all 6 Flutter platforms (Android, iOS, Web, Windows, macOS, Linux).
+- 🎨 **Material 3 Theme Adaptive**: Seamlessly adapts to light and dark themes using modern Flutter APIs.
+- 📱 **Modal Sheets**: Ready-to-use draggable bottom sheets for the Circle of Fifths and chord inspection with a single function call.
 
 ---
 
@@ -41,7 +44,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.1.1
+  flutter_circle_of_fifths: ^1.2.0
 ```
 
 Run:
@@ -52,9 +55,9 @@ flutter pub get
 
 ---
 
-## 💻 Usage
+## 💻 Usage & Examples
 
-### 1. Show as a Modal BottomSheet (One Line)
+### 1. Circle of Fifths Modal Sheet (One Line)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -72,20 +75,20 @@ void openCircleOfFifths(BuildContext context) {
 
 ---
 
-### 2. Standalone Interactive Wheel Widget
+### 2. Standalone Wheel & Diatonic Scale Card
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
-class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+class MyMusicPage extends StatefulWidget {
+  const MyMusicPage({super.key});
 
   @override
-  State<MyPage> createState() => _MyPageState();
+  State<MyMusicPage> createState() => _MyMusicPageState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _MyMusicPageState extends State<MyMusicPage> {
   int _selectedIndex = 0; // 0 = 'C'
   bool _isMinorMode = false;
 
@@ -113,6 +116,7 @@ class _MyPageState extends State<MyPage> {
             ScaleDetailCard(
               model: selectedModel,
               isMinorMode: _isMinorMode,
+              showPianoScale: true,
             ),
           ],
         ),
@@ -124,9 +128,86 @@ class _MyPageState extends State<MyPage> {
 
 ---
 
-## 🎨 Custom Theme Configuration
+### 3. Chord Sheet Viewer with Real-Time Transposition
 
-Customize colors and brand center text easily:
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+const songText = '''
+{title: Amazing Grace}
+[Verse 1]
+[C]Amazing [F]grace, how [C]sweet the sound
+That [C]saved a [G7]wretch like [C]me!
+''';
+
+Widget buildSongViewer() {
+  return ChordSheetViewer(
+    songText: songText,
+    originalKey: 'C',
+    targetKey: 'G',
+    showDiagramModalOnTap: true,
+  );
+}
+```
+
+---
+
+### 4. Instrument Chord Diagrams (Guitar, Ukulele, Piano)
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+void inspectChord(BuildContext context, String chord) {
+  ChordInspectorSheet.show(context, chordSymbol: chord);
+}
+
+Widget buildDiagrams() {
+  final chord = ChordTransposer.parseChord('G7');
+  return Column(
+    children: [
+      FretboardWidget(voicing: chord.guitarVoicing, chordTitle: 'G7 (Guitar)'),
+      FretboardWidget(voicing: chord.ukuleleVoicing, chordTitle: 'G7 (Ukulele)'),
+      PianoKeybedWidget(highlightedNotes: chord.notes, rootNote: chord.root),
+    ],
+  );
+}
+```
+
+---
+
+### 5. Harmonic Progression Builder & Roman Numerals
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+Widget buildProgression() {
+  return const ProgressionBuilderWidget(
+    activeKey: 'C',
+  );
+}
+```
+
+---
+
+### 6. Gregorian Modes & Advanced Scales
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+Widget buildScaleExplorer() {
+  return const ScaleModesWidget(
+    rootNote: 'D',
+  );
+}
+```
+
+---
+
+## 🎨 Custom Theme Configuration
 
 ```dart
 CircleOfFifthsTheme(
@@ -136,24 +217,6 @@ CircleOfFifthsTheme(
   minorChordsColor: Colors.teal,
   diminishedColor: Colors.indigo,
 )
-```
-
----
-
-## 📂 Project Structure
-
-```
-lib/
-├── flutter_circle_of_fifths.dart       # Main package exports
-└── src/
-    ├── models/
-    │   └── circle_of_fifths_model.dart # Music theory model & 12 key definitions
-    ├── theme/
-    │   └── circle_of_fifths_theme.dart # Color palette & label configuration
-    └── widgets/
-        ├── circle_of_fifths_sheet.dart # Draggable Modal Sheet with Wheel & Summary Grid
-        ├── circle_of_fifths_wheel.dart # Interactive Canvas Wheel widget
-        └── scale_detail_card.dart     # Diatonic scale breakdown card
 ```
 
 ---
