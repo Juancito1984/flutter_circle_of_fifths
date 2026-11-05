@@ -1,9 +1,13 @@
 name: flutter_circle_of_fifths
 description: "An interactive, customizable, Material 3 Circle of Fifths widget library for Flutter with support for Major and Minor keys, diatonic scale breakdown, and theme adaptation."
-version: 1.0.0
-homepage: https://github.com/ServiceNyK/flutter_circle_of_fifths
-repository: https://github.com/ServiceNyK/flutter_circle_of_fifths
-issue_tracker: https://github.com/ServiceNyK/flutter_circle_of_fifths/issues
+version: 1.1.1
+homepage: https://github.com/Juancito1984/flutter_circle_of_fifths
+repository: https://github.com/Juancito1984/flutter_circle_of_fifths
+issue_tracker: https://github.com/Juancito1984/flutter_circle_of_fifths/issues
+
+funding:
+  - https://paypal.me/NyKservice
+  - https://www.patreon.com/c/JuanPabloGosalvez
 
 environment:
   sdk: ^3.0.0
@@ -16,6 +20,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 flutter:

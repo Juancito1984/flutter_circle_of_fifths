@@ -4,17 +4,34 @@ An interactive, customizable, Material 3 **Circle of Fifths** widget library for
 
 [![pub package](https://img.shields.io/pub/v/flutter_circle_of_fifths.svg)](https://pub.dev/packages/flutter_circle_of_fifths)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.10.0-02569B?logo=flutter)](https://flutter.dev)
+
+---
+
+🌐 **Languages / Idiomas**: [Español](README_ES.md) | [English](README_EN.md)
+
+---
+
+## ☕ Support the Project / Apoya el Proyecto
+
+If this package has been helpful and you'd like to support its ongoing development and maintenance, feel free to contribute:
+
+- 💳 **PayPal**: [paypal.me/NyKservice](https://paypal.me/NyKservice)
+- 🅿️ **Patreon**: [patreon.com/JuanPabloGosalvez](https://www.patreon.com/c/JuanPabloGosalvez)
+
+Your support is greatly appreciated to keep this project 100% free, open-source, and constantly evolving!
 
 ---
 
 ## 🌟 Features
 
-- **Interactive 12-Sector Wheel**: Tap outer ring for Major keys or inner ring for Relative Minor keys.
-- **Dynamic 12:00 Rotation**: Smoothly centers the active key at top.
-- **Material 3 Theme Adaptive**: Automatically inherits application Light & Dark theme colors.
-- **Diatonic Scale Breakdown**: Shows Major and Natural Minor scale formulas (`2-2-1-2-2-2-1` and `2-1-2-2-1-2-2`).
-- **Degree Highlight Colors**: Distinct semantic highlights for Tonic ($I / i$), Subdominant ($IV / iv$), Dominant ($V / v$), and Diminished ($vii^\circ / ii^\circ$).
-- **Customizable Center Logo**: Brand text (e.g. `'NyK'`) or custom colors via `CircleOfFifthsTheme`.
+- 🎡 **Interactive 12-Sector Wheel**: Tap the outer ring for Major keys or the middle ring for Relative Minor keys.
+- 🔄 **Dynamic 12:00 Rotation**: Smoothly centers the selected key at the top of the wheel.
+- 🎨 **Material 3 Theme Adaptive**: Inherits application Light & Dark theme colors out of the box using `.withValues(alpha: ...)`.
+- 🎵 **Diatonic Scale Breakdown**: Shows Major and Natural Minor scale formulas (`2-2-1-2-2-2-1` and `2-1-2-2-1-2-2`), note degree numbers (1-8), and chord variations.
+- 🌈 **Degree Highlight Colors**: Distinct semantic highlights for Tonic ($I / i$), Subdominant ($IV / iv$), Dominant ($V / v$), and Diminished ($vii^\circ / ii^\circ$).
+- 🏷️ **Customizable Theme & Logo**: Set custom brand text (e.g. `'NyK'`) or degree colors via `CircleOfFifthsTheme`.
+- 📱 **Modal BottomSheet Ready**: Display as a bottom sheet with interactive wheel and summary grid modes in a single function call.
 
 ---
 
@@ -24,7 +41,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.0.0
+  flutter_circle_of_fifths: ^1.1.1
 ```
 
 Run:
@@ -62,6 +79,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class MyPage extends StatefulWidget {
+  const MyPage({super.key});
+
   @override
   State<MyPage> createState() => _MyPageState();
 }
@@ -72,25 +91,31 @@ class _MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedIndex];
+
     return Scaffold(
       appBar: AppBar(title: const Text('Circle of Fifths')),
-      body: Column(
-        children: [
-          CircleOfFifthsWheelWidget(
-            selectedIndex: _selectedIndex,
-            isMinorMode: _isMinorMode,
-            onKeySelected: (index, isMinor) {
-              setState(() {
-                _selectedIndex = index;
-                _isMinorMode = isMinor;
-              });
-            },
-          ),
-          ScaleDetailCard(
-            model: CircleOfFifthsModel.defaultKeys[_selectedIndex],
-            isMinorMode: _isMinorMode,
-          ),
-        ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            CircleOfFifthsWheelWidget(
+              selectedIndex: _selectedIndex,
+              isMinorMode: _isMinorMode,
+              onKeySelected: (index, isMinor) {
+                setState(() {
+                  _selectedIndex = index;
+                  _isMinorMode = isMinor;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            ScaleDetailCard(
+              model: selectedModel,
+              isMinorMode: _isMinorMode,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -101,7 +126,7 @@ class _MyPageState extends State<MyPage> {
 
 ## 🎨 Custom Theme Configuration
 
-Customize colors and brand center text:
+Customize colors and brand center text easily:
 
 ```dart
 CircleOfFifthsTheme(
@@ -111,6 +136,24 @@ CircleOfFifthsTheme(
   minorChordsColor: Colors.teal,
   diminishedColor: Colors.indigo,
 )
+```
+
+---
+
+## 📂 Project Structure
+
+```
+lib/
+├── flutter_circle_of_fifths.dart       # Main package exports
+└── src/
+    ├── models/
+    │   └── circle_of_fifths_model.dart # Music theory model & 12 key definitions
+    ├── theme/
+    │   └── circle_of_fifths_theme.dart # Color palette & label configuration
+    └── widgets/
+        ├── circle_of_fifths_sheet.dart # Draggable Modal Sheet with Wheel & Summary Grid
+        ├── circle_of_fifths_wheel.dart # Interactive Canvas Wheel widget
+        └── scale_detail_card.dart     # Diatonic scale breakdown card
 ```
 
 ---
