@@ -10,6 +10,8 @@ dependencies:
     sdk: flutter
   flutter_circle_of_fifths:
     path: ../
+#
+#  flutter_circle_of_fifths: ^1.1.1
 
 dev_dependencies:
   flutter_test:
