@@ -1,3 +1,9 @@
+## 1.2.1
+
+* Optimized `pubspec.yaml` description length for search engines and pub.dev score guidelines.
+* Updated funding links to ensure 100% reachable status on automated bot validations.
+* Restored 160/160 Pub Points.
+
 ## 1.2.0
 
 > [!NOTE]
