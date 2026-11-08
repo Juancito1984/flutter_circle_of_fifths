@@ -232,6 +232,33 @@ That [C]saved a [G7]wretch like [C]me
       expect(find.text('+1'), findsOneWidget);
     });
 
+    testWidgets('ChordSheetViewer hides chords and toolbar when showChords is false',
+        (tester) async {
+      const songText = '''
+[C]Amazing [F]grace, how [C]sweet the sound
+That [C]saved a [G7]wretch like [C]me
+''';
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ChordSheetViewer(
+                songText: songText,
+                showChords: false,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(ChordSheetViewer), findsOneWidget);
+      expect(find.text('Amazing grace, how sweet the sound'), findsNothing); // split in segments
+      expect(find.text('G7'), findsNothing);
+      expect(find.text('C'), findsNothing);
+      expect(find.byTooltip('+1 Semitone'), findsNothing);
+    });
+
     testWidgets('ProgressionBuilderWidget and ScaleModesWidget render cleanly',
         (tester) async {
       await tester.pumpWidget(

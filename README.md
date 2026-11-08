@@ -146,6 +146,7 @@ Widget buildSongViewer() {
     songText: songText,
     originalKey: 'C',
     targetKey: 'G', // Transposes chords automatically to G Major
+    showChords: true, // Set to false to hide chords and show lyrics only
     showDiagramModalOnTap: true, // Opens Guitar/Ukulele/Piano modal on chord tap
   );
 }

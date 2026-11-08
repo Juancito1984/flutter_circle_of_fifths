@@ -1,8 +1,15 @@
 ## 1.2.2
 
+* **Control de Interlineado y Espaciado en `ChordSheetViewer`**:
+  * Nueva propiedad `lineSpacing` para controlar el espacio vertical entre líneas/versos de la canción (por defecto `8.0`).
+  * Nueva propiedad `chordToLyricSpacing` para ajustar la distancia entre la etiqueta del acorde y la sílaba de la letra (por defecto `2.0`).
+  * `lineRunSpacing` para el espacio cuando un verso largo se envuelve (*wrap*) en múltiples renglones.
+* **Propiedad `showChords` en `ChordSheetViewer`**:
+  * Permite alternar la visualización de los acordes encima de las letras (`true` por defecto).
+  * Cuando `showChords: false`, oculta los badges de acordes, los espaciados superiores y la barra de transposición, mostrando la letra limpia sin interrupciones.
 * **Soporte Completo de Internacionalización (i18n / Localización)**:
   * Se restauraron y ampliaron los parámetros `title`, `interactiveWheelLabel` y `summaryViewLabel` en `CircleOfFifthsSheet.show(...)` y en su constructor, permitiendo pasar directamente los strings de idioma personalizados.
-  * Nueva clase `CircleOfFifthsLabels` para configurar y traducir todas las etiquetas de la suite (modos, acordes, transpositor, inspector, progresiones).
+  * Nueva clase `CircleOfFifthsLabels` con método `.copyWith(...)` para configurar y traducir todas las etiquetas de la suite (modos, acordes, transpositor, inspector, progresiones).
   * Incluye configuración predefinida en español con `CircleOfFifthsLabels.spanish`.
   * Integración del parámetro opcional `labels` en `ScaleDetailCard`, `ChordSheetViewer`, `ChordInspectorSheet`, `ProgressionBuilderWidget` y `ScaleModesWidget`.
 

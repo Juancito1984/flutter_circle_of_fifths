@@ -76,7 +76,8 @@ And [Am]grace will [G7]lead me [C]home.
   @override
   Widget build(BuildContext context) {
     final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedKeyIndex];
-    final activeKey = _isMinorMode ? selectedModel.minor.toUpperCase() : selectedModel.major;
+    final activeKey =
+        _isMinorMode ? selectedModel.minor.toUpperCase() : selectedModel.major;
 
     return Scaffold(
       appBar: AppBar(

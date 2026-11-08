@@ -36,6 +36,11 @@ class ChordSheetViewer extends StatefulWidget {
   /// Guitar, Ukulele, and Piano diagrams.
   final bool showDiagramModalOnTap;
 
+  /// Whether to display chords above the lyrics.
+  /// When set to `false`, chords and chord spaces are hidden, rendering lyrics only.
+  /// Defaults to `true`.
+  final bool showChords;
+
   /// Default instrument tab when opening the chord inspector modal.
   final InstrumentType defaultInstrument;
 
@@ -60,8 +65,14 @@ class ChordSheetViewer extends StatefulWidget {
   /// Horizontal spacing between word chunks in a line.
   final double wordSpacing;
 
-  /// Vertical spacing between wrapped segments in a line.
+  /// Vertical spacing between wrapped segments when a single line wraps to the next line.
   final double lineRunSpacing;
+
+  /// Vertical spacing between consecutive song lines (interlineado entre versos).
+  final double lineSpacing;
+
+  /// Vertical spacing between chord badge and lyric text underneath.
+  final double chordToLyricSpacing;
 
   /// Creates a [ChordSheetViewer] widget.
   const ChordSheetViewer({
@@ -73,6 +84,7 @@ class ChordSheetViewer extends StatefulWidget {
     this.showTranspositionBar = true,
     this.showChordSummaryBar = true,
     this.showDiagramModalOnTap = true,
+    this.showChords = true,
     this.defaultInstrument = InstrumentType.guitar,
     this.labels = const CircleOfFifthsLabels(),
     this.onTapChord,
@@ -82,6 +94,8 @@ class ChordSheetViewer extends StatefulWidget {
     this.sectionStyle,
     this.wordSpacing = 4.0,
     this.lineRunSpacing = 8.0,
+    this.lineSpacing = 8.0,
+    this.chordToLyricSpacing = 2.0,
   });
 
   @override
@@ -209,11 +223,13 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.showTranspositionBar) ...[
+        if (widget.showChords && widget.showTranspositionBar) ...[
           _buildTranspositionToolbar(context, effectiveKey),
           const SizedBox(height: 12),
         ],
-        if (widget.showChordSummaryBar && doc.uniqueChords.isNotEmpty) ...[
+        if (widget.showChords &&
+            widget.showChordSummaryBar &&
+            doc.uniqueChords.isNotEmpty) ...[
           _buildUniqueChordsBar(context, doc.uniqueChords),
           const SizedBox(height: 16),
         ],
@@ -450,11 +466,12 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           ),
         );
       case ChordSheetLineType.chordLyrics:
-        final hasAnyChord = line.segments.any(
-          (s) => s.chord != null && s.chord!.isNotEmpty,
-        );
+        final hasAnyChord = widget.showChords &&
+            line.segments.any(
+              (s) => s.chord != null && s.chord!.isNotEmpty,
+            );
         return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.only(bottom: widget.lineSpacing),
           child: Wrap(
             spacing: widget.wordSpacing,
             runSpacing: widget.lineRunSpacing,
@@ -481,7 +498,9 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     required TextStyle chordStyle,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasChord = segment.chord != null && segment.chord!.isNotEmpty;
+    final hasChord = widget.showChords &&
+        segment.chord != null &&
+        segment.chord!.isNotEmpty;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -490,7 +509,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
         if (hasAnyChordInLine)
           hasChord
               ? Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
+                  padding: EdgeInsets.only(bottom: widget.chordToLyricSpacing),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: () => _handleChordTap(segment.chord!),
@@ -513,7 +532,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                     ),
                   ),
                 )
-              : const SizedBox(height: 24),
+              : SizedBox(height: 22 + widget.chordToLyricSpacing),
         if (segment.lyric.isNotEmpty)
           Text(
             segment.lyric,

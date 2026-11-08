@@ -146,6 +146,7 @@ Widget visorDeCancion() {
     songText: cancionTexto,
     originalKey: 'C',
     targetKey: 'G', // Transpone automáticamente a Sol Mayor
+    showChords: true, // Cambia a false para ocultar acordes y ver solo la letra
     showDiagramModalOnTap: true, // Abre modal con Guitarra/Ukulele/Piano al pulsar un acorde
   );
 }
