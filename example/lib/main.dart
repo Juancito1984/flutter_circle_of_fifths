@@ -201,6 +201,8 @@ And [Am]grace will [G7]lead me [C]home.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: ChordSheetViewer(
+        showChords: false,
+        lineSpacing: 6,
         songText: _sampleSong,
         originalKey: 'C',
         targetKey: selectedModel.major,

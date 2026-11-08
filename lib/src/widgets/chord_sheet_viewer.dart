@@ -428,7 +428,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
 
     switch (line.type) {
       case ChordSheetLineType.empty:
-        return const SizedBox(height: 12);
+        return SizedBox(height: widget.lineSpacing * 1.5);
       case ChordSheetLineType.title:
         return Padding(
           padding: const EdgeInsets.only(bottom: 4),
@@ -470,6 +470,21 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
             line.segments.any(
               (s) => s.chord != null && s.chord!.isNotEmpty,
             );
+
+        // When showChords is false, we can render pure Text spans for pixel-perfect
+        // font line-height, text selection, and exact lyricStyle.height handling.
+        if (!widget.showChords) {
+          final fullLineText =
+              line.segments.map((s) => s.lyric).join();
+          return Padding(
+            padding: EdgeInsets.only(bottom: widget.lineSpacing),
+            child: Text(
+              fullLineText,
+              style: lyricStyle,
+            ),
+          );
+        }
+
         return Padding(
           padding: EdgeInsets.only(bottom: widget.lineSpacing),
           child: Wrap(

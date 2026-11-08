@@ -253,7 +253,7 @@ That [C]saved a [G7]wretch like [C]me
       );
 
       expect(find.byType(ChordSheetViewer), findsOneWidget);
-      expect(find.text('Amazing grace, how sweet the sound'), findsNothing); // split in segments
+      expect(find.text('Amazing grace, how sweet the sound'), findsOneWidget);
       expect(find.text('G7'), findsNothing);
       expect(find.text('C'), findsNothing);
       expect(find.byTooltip('+1 Semitone'), findsNothing);
