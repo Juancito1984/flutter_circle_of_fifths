@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/chord_model.dart';
 import '../models/chord_sheet_parser.dart';
 import '../models/circle_of_fifths_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
 
 /// Interactive Material 3 ChordPro / Bracket-notation viewer and transposition widget.
@@ -38,6 +39,9 @@ class ChordSheetViewer extends StatefulWidget {
   /// Default instrument tab when opening the chord inspector modal.
   final InstrumentType defaultInstrument;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Optional callback triggered whenever a chord is tapped.
   final ValueChanged<ChordInfo>? onTapChord;
 
@@ -70,6 +74,7 @@ class ChordSheetViewer extends StatefulWidget {
     this.showChordSummaryBar = true,
     this.showDiagramModalOnTap = true,
     this.defaultInstrument = InstrumentType.guitar,
+    this.labels = const CircleOfFifthsLabels(),
     this.onTapChord,
     this.onTransposeChanged,
     this.lyricStyle,
@@ -158,6 +163,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
         context,
         chordSymbol: chordSymbol,
         initialInstrument: widget.defaultInstrument,
+        labels: widget.labels,
       );
     }
   }
@@ -229,6 +235,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final labels = widget.labels;
 
     final semitoneLabel =
         _semitones > 0 ? '+$_semitones' : '$_semitones';
@@ -259,7 +266,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
               ),
               const SizedBox(width: 6),
               Text(
-                'Transpose:',
+                labels.transposeLabel,
                 style: textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -292,7 +299,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
               if (_semitones != 0)
                 TextButton(
                   onPressed: () => _updateTranspose(0),
-                  child: const Text('Reset'),
+                  child: Text(labels.resetLabel),
                 ),
             ],
           ),
@@ -302,7 +309,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Key:',
+                labels.keyLabel,
                 style: textTheme.labelLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -366,7 +373,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           ),
           const SizedBox(width: 6),
           Text(
-            'Chords (tap to view diagram):',
+            widget.labels.uniqueChordsLabel,
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

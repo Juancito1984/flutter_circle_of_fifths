@@ -1,3 +1,11 @@
+## 1.2.2
+
+* **Soporte Completo de Internacionalización (i18n / Localización)**:
+  * Se restauraron y ampliaron los parámetros `title`, `interactiveWheelLabel` y `summaryViewLabel` en `CircleOfFifthsSheet.show(...)` y en su constructor, permitiendo pasar directamente los strings de idioma personalizados.
+  * Nueva clase `CircleOfFifthsLabels` para configurar y traducir todas las etiquetas de la suite (modos, acordes, transpositor, inspector, progresiones).
+  * Incluye configuración predefinida en español con `CircleOfFifthsLabels.spanish`.
+  * Integración del parámetro opcional `labels` en `ScaleDetailCard`, `ChordSheetViewer`, `ChordInspectorSheet`, `ProgressionBuilderWidget` y `ScaleModesWidget`.
+
 ## 1.2.1
 
 * Optimized `pubspec.yaml` description length for search engines and pub.dev score guidelines.

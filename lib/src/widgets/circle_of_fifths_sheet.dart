@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/circle_of_fifths_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import '../theme/circle_of_fifths_theme.dart';
 import 'circle_of_fifths_wheel.dart';
 import 'scale_detail_card.dart';
@@ -9,16 +10,36 @@ class CircleOfFifthsSheet extends StatefulWidget {
   /// Custom theme configuration for colors and center brand label.
   final CircleOfFifthsTheme customTheme;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Creates a [CircleOfFifthsSheet] bottom sheet widget.
   const CircleOfFifthsSheet({
     super.key,
     this.customTheme = const CircleOfFifthsTheme(),
-  });
+    this.labels = const CircleOfFifthsLabels(),
+    String? title,
+    String? interactiveWheelLabel,
+    String? summaryViewLabel,
+  }) : _overrideTitle = title,
+       _overrideInteractiveWheelLabel = interactiveWheelLabel,
+       _overrideSummaryViewLabel = summaryViewLabel;
+
+  final String? _overrideTitle;
+  final String? _overrideInteractiveWheelLabel;
+  final String? _overrideSummaryViewLabel;
 
   /// Static helper to display the sheet easily from any BuildContext.
+  ///
+  /// Supports direct label properties (`title`, `interactiveWheelLabel`, `summaryViewLabel`)
+  /// for simple localization, as well as a full [labels] object.
   static void show(
     BuildContext context, {
     CircleOfFifthsTheme customTheme = const CircleOfFifthsTheme(),
+    CircleOfFifthsLabels labels = const CircleOfFifthsLabels(),
+    String? title,
+    String? interactiveWheelLabel,
+    String? summaryViewLabel,
   }) {
     showModalBottomSheet(
       context: context,
@@ -27,7 +48,13 @@ class CircleOfFifthsSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (context) => CircleOfFifthsSheet(customTheme: customTheme),
+      builder: (context) => CircleOfFifthsSheet(
+        customTheme: customTheme,
+        labels: labels,
+        title: title,
+        interactiveWheelLabel: interactiveWheelLabel,
+        summaryViewLabel: summaryViewLabel,
+      ),
     );
   }
 
@@ -45,6 +72,12 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedIndex];
+
+    final sheetTitle = widget._overrideTitle ?? widget.labels.title;
+    final wheelLabel = widget._overrideInteractiveWheelLabel ??
+        widget.labels.interactiveWheelLabel;
+    final summaryLabel =
+        widget._overrideSummaryViewLabel ?? widget.labels.summaryViewLabel;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -80,7 +113,7 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Circle of Fifths',
+                    sheetTitle,
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -92,16 +125,16 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
 
               // View Selector (SegmentedButton)
               SegmentedButton<int>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: 0,
-                    label: Text('Interactive Wheel'),
-                    icon: Icon(Icons.incomplete_circle_rounded),
+                    label: Text(wheelLabel),
+                    icon: const Icon(Icons.incomplete_circle_rounded),
                   ),
                   ButtonSegment(
                     value: 1,
-                    label: Text('Summary View'),
-                    icon: Icon(Icons.grid_view_rounded),
+                    label: Text(summaryLabel),
+                    icon: const Icon(Icons.grid_view_rounded),
                   ),
                 ],
                 selected: {_selectedView},
@@ -130,6 +163,7 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                 ScaleDetailCard(
                   model: selectedModel,
                   isMinorMode: _isMinorMode,
+                  labels: widget.labels,
                 ),
               ]
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/circle_of_fifths_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
 import 'piano_keybed_widget.dart';
 
@@ -18,6 +19,9 @@ class ScaleDetailCard extends StatelessWidget {
   /// Whether tapping a scale degree opens [ChordInspectorSheet] for that degree's chord.
   final bool enableChordTap;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Creates a [ScaleDetailCard] widget displaying scale notes and interval formula.
   const ScaleDetailCard({
     super.key,
@@ -25,6 +29,7 @@ class ScaleDetailCard extends StatelessWidget {
     this.isMinorMode = false,
     this.showPianoScale = false,
     this.enableChordTap = true,
+    this.labels = const CircleOfFifthsLabels(),
   });
 
   String _formatDegreeNote(String note, int index) {
@@ -101,8 +106,8 @@ class ScaleDetailCard extends StatelessWidget {
 
     final notes = isMinorMode ? model.minorScaleNotes : model.majorScaleNotes;
     final scaleTitle = isMinorMode
-        ? '${model.minor.toUpperCase()}m Minor (Relative of ${model.major})'
-        : '${model.major} Major';
+        ? '${model.minor.toUpperCase()}m ${labels.minorLabel} ${model.major})'
+        : '${model.major} ${labels.majorLabel}';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -130,7 +135,7 @@ class ScaleDetailCard extends StatelessWidget {
               ),
               if (enableChordTap)
                 Text(
-                  'Tap degree for chord',
+                  labels.tapDegreeForChordHint,
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -153,6 +158,7 @@ class ScaleDetailCard extends StatelessWidget {
                     ? () => ChordInspectorSheet.show(
                           context,
                           chordSymbol: chordSymbol,
+                          labels: labels,
                         )
                     : null,
                 child: Padding(

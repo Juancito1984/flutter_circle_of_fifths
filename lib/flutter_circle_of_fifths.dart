@@ -9,6 +9,7 @@ export 'src/models/chord_sheet_parser.dart';
 export 'src/models/circle_of_fifths_model.dart';
 export 'src/models/harmonic_progression_model.dart';
 export 'src/models/scale_mode_model.dart';
+export 'src/theme/circle_of_fifths_labels.dart';
 export 'src/theme/circle_of_fifths_theme.dart';
 export 'src/widgets/chord_inspector_sheet.dart';
 export 'src/widgets/chord_sheet_viewer.dart';

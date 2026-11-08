@@ -209,6 +209,50 @@ Widget exploradorModos() {
 
 ---
 
+### 7. Internacionalización y Personalización de Idioma (i18n)
+
+Configura o traduce todos los textos de la interfaz desde un único lugar con `CircleOfFifthsLabels`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+// Opción A: Usar la traducción al español integrada directamente
+final etiquetasEspanol = CircleOfFifthsLabels.spanish;
+
+// Opción B: Modificar solo algunas palabras usando copyWith
+final etiquetasPersonalizadas = CircleOfFifthsLabels.spanish.copyWith(
+  tapDegreeForChordHint: 'Presiona para ver el acorde',
+);
+
+// Opción C: Conectar todas las traducciones desde el gestor de idiomas de tu app (l10n)
+final misEtiquetas = CircleOfFifthsLabels(
+  title: context.idioma.circuloDeQuintas,
+  interactiveWheelLabel: context.idioma.ruedaInteractiva,
+  summaryViewLabel: context.idioma.vistaResumen,
+  majorLabel: context.idioma.mayor,
+  minorLabel: context.idioma.menor,
+  tapDegreeForChordHint: context.idioma.tocaParaVerAcorde,
+  transposeLabel: context.idioma.transponer,
+  resetLabel: context.idioma.restablecer,
+  keyLabel: context.idioma.tonalidad,
+  uniqueChordsLabel: context.idioma.acordesDeLaCancion,
+  guitarLabel: context.idioma.guitarra,
+  ukuleleLabel: context.idioma.ukelele,
+  pianoLabel: context.idioma.piano,
+  progressionTitle: context.idioma.progresionArmonica,
+  modesCategoryLabel: context.idioma.modos,
+  advancedCategoryLabel: context.idioma.avanzado,
+);
+
+// Pásalo a cualquier widget o modal de la librería:
+void mostrarModalConIdioma(BuildContext context) {
+  CircleOfFifthsSheet.show(context, labels: misEtiquetas);
+}
+```
+
+---
+
 ## 🎨 Configuración de Tema Personalizado
 
 ```dart

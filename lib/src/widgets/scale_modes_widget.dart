@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../models/scale_mode_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
 import 'piano_keybed_widget.dart';
 
@@ -17,6 +18,9 @@ class ScaleModesWidget extends StatefulWidget {
   /// Whether to render an interactive piano keyboard displaying the scale notes.
   final bool showPianoKeyboard;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Callback when a scale or mode is selected.
   final ValueChanged<ScaleFormula>? onScaleChanged;
 
@@ -26,6 +30,7 @@ class ScaleModesWidget extends StatefulWidget {
     this.rootNote = 'C',
     this.showRootSelector = true,
     this.showPianoKeyboard = true,
+    this.labels = const CircleOfFifthsLabels(),
     this.onScaleChanged,
   });
 
@@ -64,6 +69,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final labels = widget.labels;
 
     final scalesList = _categoryTab == 0
         ? ScaleFormula.gregorianModes
@@ -79,16 +85,16 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SegmentedButton<int>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: 0,
-                  label: Text('Modes (7)'),
-                  icon: Icon(Icons.temple_buddhist_rounded),
+                  label: Text(labels.modesCategoryLabel),
+                  icon: const Icon(Icons.temple_buddhist_rounded),
                 ),
                 ButtonSegment(
                   value: 1,
-                  label: Text('Advanced'),
-                  icon: Icon(Icons.auto_awesome_rounded),
+                  label: Text(labels.advancedCategoryLabel),
+                  icon: const Icon(Icons.auto_awesome_rounded),
                 ),
               ],
               selected: {_categoryTab},
@@ -120,7 +126,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
                     items: CircleOfFifthsModel.defaultKeys.map((k) {
                       return DropdownMenuItem<String>(
                         value: k.major,
-                        child: Text('${k.major} Root'),
+                        child: Text('${k.major} ${labels.rootDropdownSuffix}'),
                       );
                     }).toList(),
                     onChanged: (newRoot) {
@@ -182,7 +188,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
                     ),
                   ),
                   Text(
-                    'Tap note for chord',
+                    labels.tapDegreeForChordHint,
                     style: textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -213,6 +219,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
                       ChordInspectorSheet.show(
                         context,
                         chordSymbol: note,
+                        labels: labels,
                       );
                     },
                     child: Container(
@@ -263,7 +270,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Step Formula (Semitones): ',
+                    labels.stepFormulaLabel,
                     style: textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurfaceVariant,

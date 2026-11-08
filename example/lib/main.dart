@@ -171,6 +171,9 @@ And [Am]grace will [G7]lead me [C]home.
       child: Column(
         children: [
           CircleOfFifthsWheelWidget(
+            customTheme: const CircleOfFifthsTheme(
+              centerLabel: 'ARB',
+            ),
             selectedIndex: _selectedKeyIndex,
             isMinorMode: _isMinorMode,
             onKeySelected: (index, isMinor) {
@@ -182,6 +185,7 @@ And [Am]grace will [G7]lead me [C]home.
           ),
           const SizedBox(height: 20),
           ScaleDetailCard(
+            labels: CircleOfFifthsLabels.spanish,
             model: selectedModel,
             isMinorMode: _isMinorMode,
             showPianoScale: true,

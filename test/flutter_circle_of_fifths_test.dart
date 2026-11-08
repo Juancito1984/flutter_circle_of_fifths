@@ -183,6 +183,25 @@ That [C]saved a [G7]wretch like [C]me
       expect(find.byType(ScaleDetailCard), findsOneWidget);
     });
 
+    testWidgets('CircleOfFifthsSheet displays interactive wheel, title and custom labels',
+        (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: CircleOfFifthsSheet(
+              title: 'Círculo de Quintas',
+              interactiveWheelLabel: 'Rueda Interactiva',
+              summaryViewLabel: 'Vista Resumen',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Círculo de Quintas'), findsOneWidget);
+      expect(find.text('Rueda Interactiva'), findsOneWidget);
+      expect(find.text('Vista Resumen'), findsOneWidget);
+    });
+
     testWidgets('ChordSheetViewer renders lyrics, chords, and transposes on tap',
         (tester) async {
       const songText = '''
@@ -221,8 +240,14 @@ That [C]saved a [G7]wretch like [C]me
             body: SingleChildScrollView(
               child: Column(
                 children: [
-                  ProgressionBuilderWidget(activeKey: 'C'),
-                  ScaleModesWidget(rootNote: 'C'),
+                  ProgressionBuilderWidget(
+                    activeKey: 'C',
+                    labels: CircleOfFifthsLabels.spanish,
+                  ),
+                  ScaleModesWidget(
+                    rootNote: 'C',
+                    labels: CircleOfFifthsLabels.spanish,
+                  ),
                 ],
               ),
             ),
@@ -232,7 +257,8 @@ That [C]saved a [G7]wretch like [C]me
 
       expect(find.byType(ProgressionBuilderWidget), findsOneWidget);
       expect(find.byType(ScaleModesWidget), findsOneWidget);
-      expect(find.text('Harmonic Progression'), findsOneWidget);
+      expect(find.text('Progresión Armónica'), findsOneWidget);
+      expect(find.text('Modos (7)'), findsOneWidget);
     });
   });
 }

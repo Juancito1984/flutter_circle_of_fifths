@@ -209,6 +209,50 @@ Widget buildScaleExplorer() {
 
 ---
 
+### 7. Localization & Custom Language (i18n)
+
+Customize or translate all UI text across the entire suite from a single place using `CircleOfFifthsLabels`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
+
+// Option A: Use the built-in Spanish translations
+final spanishLabels = CircleOfFifthsLabels.spanish;
+
+// Option B: Customize specific labels using copyWith
+final customLabels = CircleOfFifthsLabels.spanish.copyWith(
+  tapDegreeForChordHint: 'Tap to inspect chord',
+);
+
+// Option C: Define all translations from your app's localization (l10n)
+final myLabels = CircleOfFifthsLabels(
+  title: context.l10n.circleOfFifths,
+  interactiveWheelLabel: context.l10n.interactiveWheel,
+  summaryViewLabel: context.l10n.summaryView,
+  majorLabel: context.l10n.major,
+  minorLabel: context.l10n.minor,
+  tapDegreeForChordHint: context.l10n.tapDegreeHint,
+  transposeLabel: context.l10n.transpose,
+  resetLabel: context.l10n.reset,
+  keyLabel: context.l10n.key,
+  uniqueChordsLabel: context.l10n.songChords,
+  guitarLabel: context.l10n.guitar,
+  ukuleleLabel: context.l10n.ukulele,
+  pianoLabel: context.l10n.piano,
+  progressionTitle: context.l10n.progressionTitle,
+  modesCategoryLabel: context.l10n.modes,
+  advancedCategoryLabel: context.l10n.advanced,
+);
+
+// Pass it to any widget or modal sheet:
+void showLocalized(BuildContext context) {
+  CircleOfFifthsSheet.show(context, labels: myLabels);
+}
+```
+
+---
+
 ## 🎨 Custom Theme Configuration
 
 ```dart

@@ -1,7 +1,7 @@
 name: flutter_circle_of_fifths
 description: "A comprehensive Flutter music suite: interactive Circle of Fifths, ChordPro sheet viewer, instrument diagrams, progressions, and modes."
 #
-version: 1.2.1
+version: 1.2.2
 homepage: https://github.com/Juancito1984/flutter_circle_of_fifths/blob/master/README.md
 repository: https://github.com/Juancito1984/flutter_circle_of_fifths
 issue_tracker: https://github.com/Juancito1984/flutter_circle_of_fifths/issues

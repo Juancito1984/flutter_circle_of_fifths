@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../models/harmonic_progression_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
 
 /// Interactive Progression Builder and Harmonic Analyzer widget with Roman Numeral Notation.
@@ -18,6 +19,9 @@ class ProgressionBuilderWidget extends StatefulWidget {
   /// Whether to allow the user to change the active key directly.
   final bool showKeySelector;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Optional callback when a chord in the progression is tapped.
   final ValueChanged<String>? onChordTap;
 
@@ -26,6 +30,7 @@ class ProgressionBuilderWidget extends StatefulWidget {
     super.key,
     this.activeKey = 'C',
     this.showKeySelector = true,
+    this.labels = const CircleOfFifthsLabels(),
     this.onChordTap,
   });
 
@@ -79,6 +84,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final labels = widget.labels;
     final passingChords = HarmonicProgression.getPassingChordSuggestions(_key);
 
     return Column(
@@ -92,14 +98,14 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Harmonic Progression',
+                  labels.progressionTitle,
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
                   ),
                 ),
                 Text(
-                  'Roman numeral harmonic analysis',
+                  labels.progressionSubtitle,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -124,7 +130,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
                     items: CircleOfFifthsModel.defaultKeys.map((k) {
                       return DropdownMenuItem<String>(
                         value: k.major,
-                        child: Text('${k.major} Major'),
+                        child: Text('${k.major} ${labels.majorLabel}'),
                       );
                     }).toList(),
                     onChanged: (newKey) {
@@ -200,6 +206,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
                 ChordInspectorSheet.show(
                   context,
                   chordSymbol: chordSymbol,
+                  labels: widget.labels,
                 );
               },
               child: Container(
@@ -295,7 +302,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
 
         // Passing Chords & Modulations Suggestion Section
         Text(
-          'Passing Chords & Secondary Dominants (Tap to add):',
+          labels.passingChordsSectionLabel,
           style: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/chord_model.dart';
+import '../theme/circle_of_fifths_labels.dart';
 import 'fretboard_widget.dart';
 import 'piano_keybed_widget.dart';
 
@@ -12,11 +13,15 @@ class ChordInspectorSheet extends StatefulWidget {
   /// Initial instrument tab to show (`guitar`, `ukulele`, or `piano`).
   final InstrumentType initialInstrument;
 
+  /// Custom localization labels.
+  final CircleOfFifthsLabels labels;
+
   /// Creates a [ChordInspectorSheet] widget.
   const ChordInspectorSheet({
     super.key,
     required this.chordInfo,
     this.initialInstrument = InstrumentType.guitar,
+    this.labels = const CircleOfFifthsLabels(),
   });
 
   /// Convenience helper to open a Material 3 modal bottom sheet inspecting [chordSymbol].
@@ -24,6 +29,7 @@ class ChordInspectorSheet extends StatefulWidget {
     BuildContext context, {
     required String chordSymbol,
     InstrumentType initialInstrument = InstrumentType.guitar,
+    CircleOfFifthsLabels labels = const CircleOfFifthsLabels(),
   }) {
     final info = ChordTransposer.parseChord(chordSymbol);
     return showModalBottomSheet<void>(
@@ -38,6 +44,7 @@ class ChordInspectorSheet extends StatefulWidget {
         child: ChordInspectorSheet(
           chordInfo: info,
           initialInstrument: initialInstrument,
+          labels: labels,
         ),
       ),
     );
@@ -61,6 +68,7 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final info = widget.chordInfo;
+    final labels = widget.labels;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -104,14 +112,14 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Root: ${info.root}${info.bassNote != null ? ' (Bass: ${info.bassNote})' : ''}',
+                      '${labels.rootLabel} ${info.root}${info.bassNote != null ? ' (${labels.bassLabel} ${info.bassNote})' : ''}',
                       style: textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
                       ),
                     ),
                     Text(
-                      'Intervals: ${info.intervalLabels.join(' - ')}',
+                      '${labels.intervalsLabel} ${info.intervalLabels.join(' - ')}',
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -123,7 +131,7 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
             IconButton(
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.close_rounded),
-              tooltip: 'Close',
+              tooltip: labels.closeTooltip,
             ),
           ],
         ),
@@ -144,7 +152,7 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Notes:',
+                labels.notesLabel,
                 style: textTheme.labelLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
@@ -173,21 +181,21 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
 
         // Instrument Selector
         SegmentedButton<InstrumentType>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: InstrumentType.guitar,
-              label: Text('Guitar'),
-              icon: Icon(Icons.music_note_rounded),
+              label: Text(labels.guitarLabel),
+              icon: const Icon(Icons.music_note_rounded),
             ),
             ButtonSegment(
               value: InstrumentType.ukulele,
-              label: Text('Ukulele'),
-              icon: Icon(Icons.audiotrack_rounded),
+              label: Text(labels.ukuleleLabel),
+              icon: const Icon(Icons.audiotrack_rounded),
             ),
             ButtonSegment(
               value: InstrumentType.piano,
-              label: Text('Piano'),
-              icon: Icon(Icons.piano_rounded),
+              label: Text(labels.pianoLabel),
+              icon: const Icon(Icons.piano_rounded),
             ),
           ],
           selected: {_selectedInstrument},
