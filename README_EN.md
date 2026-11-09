@@ -33,6 +33,7 @@ Your support is greatly appreciated to keep this project 100% free, open-source,
 - 🎼 **Harmonic Progression Builder (`ProgressionBuilderWidget`)**: Popular templates (Pop Axis of Awesome, Jazz ii-V-I, 12-Bar Blues, Canon), Roman numeral analysis ($I, ii, iii, IV, V, vi, vii^\circ$), and secondary dominant suggestions.
 - 🎷 **7 Gregorian Modes & Advanced Scales (`ScaleModesWidget`)**: Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian, plus Pentatonics, Blues, Harmonic Minor, and Melodic Minor.
 - 🔊 **Zero-Dependency Audio Synthesis (`SimpleAudioSynthesizer`)**: Pure Dart in-memory PCM WAV synthesis for notes and chords across all 6 Flutter platforms (Android, iOS, Web, Windows, macOS, Linux).
+- 🌐 **Full Localization (i18n)**: Translate or customize all text labels (`CircleOfFifthsLabels`) across all widgets from a single place, with built-in Spanish support (`CircleOfFifthsLabels.spanish`).
 - 🎨 **Material 3 Theme Adaptive**: Seamlessly adapts to light and dark themes using modern Flutter APIs.
 - 📱 **Modal Sheets**: Ready-to-use draggable bottom sheets for the Circle of Fifths and chord inspection with a single function call.
 
@@ -44,7 +45,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.2.0
+  flutter_circle_of_fifths: ^1.3.0
 ```
 
 Run:
@@ -147,6 +148,8 @@ Widget buildSongViewer() {
     originalKey: 'C',
     targetKey: 'G',
     showChords: true, // Set to false to hide chords and show lyrics only
+    lineSpacing: 6.0, // Space between consecutive lines within a stanza
+    stanzaSpacing: 18.0, // Space between stanzas (empty lines)
     showDiagramModalOnTap: true,
   );
 }

@@ -33,6 +33,7 @@ Si este paquete te ha sido útil y deseas apoyar su desarrollo y mantenimiento c
 - 🎼 **Constructor de Progresiones Armónicas (`ProgressionBuilderWidget`)**: Plantillas estándar (Pop/Rock Axis, Jazz ii-V-I, 12-Bar Blues, Canon de Pachelbel), análisis en números romanos ($I, ii, iii, IV, V, vi, vii^\circ$) y sugerencias de dominantes secundarios.
 - 🎷 **7 Modos Gregorianos y Escalas Avanzadas (`ScaleModesWidget`)**: Jónico, Dórico, Frigio, Lidio, Mixolidio, Eolio y Locrio; más Pentatónicas, Blues, Menor Armónica y Menor Melódica.
 - 🔊 **Síntesis de Audio en Dart Puro (`SimpleAudioSynthesizer`)**: Generación de audio PCM WAV en memoria sin plugins nativos, 100% funcional en las 6 plataformas (Android, iOS, Web, Windows, macOS, Linux).
+- 🌐 **Internacionalización Completa (i18n)**: Personaliza o traduce todos los textos (`CircleOfFifthsLabels`) de todos los widgets desde un solo lugar, con soporte en español integrado (`CircleOfFifthsLabels.spanish`).
 - 🎨 **Adaptativo a Material 3**: Hereda de forma nativa la paleta de colores claro y oscuro de la aplicación.
 - 📱 **Modales BottomSheet Listos para Usar**: Se despliegan con una sola línea de código para el Círculo de Quintas y el Inspector de Acordes.
 
@@ -44,7 +45,7 @@ Agrega la dependencia en tu archivo `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.2.0
+  flutter_circle_of_fifths: ^1.3.0
 ```
 
 Ejecuta en la terminal:

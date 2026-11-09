@@ -1,13 +1,17 @@
-## 1.2.2
+## 1.3.0
 
-* **Control de Interlineado y Separación de Estrofas en `ChordSheetViewer`**:
-  * Nueva propiedad `stanzaSpacing` para controlar de forma independiente el espacio vertical entre estrofas (por defecto `16.0`). Evita que al usar un `lineSpacing` bajo las estrofas se junten en un solo bloque.
-  * Propiedad `lineSpacing` para controlar el espacio vertical entre líneas/versos de la canción (por defecto `8.0`).
-  * Propiedad `chordToLyricSpacing` para ajustar la distancia entre la etiqueta del acorde y la sílaba de la letra (por defecto `2.0`).
-  * `lineRunSpacing` para el espacio cuando un verso largo se envuelve (*wrap*) en múltiples renglones.
 * **Propiedad `showChords` en `ChordSheetViewer`**:
   * Permite alternar la visualización de los acordes encima de las letras (`true` por defecto).
   * Cuando `showChords: false`, oculta los badges de acordes, los espaciados superiores y la barra de transposición, mostrando la letra limpia sin interrupciones.
+  * Renderizado optimizado con flujo de texto continuo y selección nativa.
+* **Control Independiente de Separación entre Estrofas (`stanzaSpacing`)**:
+  * Nueva propiedad `stanzaSpacing` en `ChordSheetViewer` (por defecto `16.0`). Evita que al usar valores bajos de `lineSpacing` las estrofas se junten en un solo bloque continuo.
+* **Ajuste de Interlineado en `ChordSheetViewer`**:
+  * Espaciado vertical entre versos (`lineSpacing`, por defecto `8.0`).
+  * Distancia vertical entre acorde y letra (`chordToLyricSpacing`, por defecto `2.0`).
+
+## 1.2.2
+
 * **Soporte Completo de Internacionalización (i18n / Localización)**:
   * Se restauraron y ampliaron los parámetros `title`, `interactiveWheelLabel` y `summaryViewLabel` en `CircleOfFifthsSheet.show(...)` y en su constructor, permitiendo pasar directamente los strings de idioma personalizados.
   * Nueva clase `CircleOfFifthsLabels` con método `.copyWith(...)` para configurar y traducir todas las etiquetas de la suite (modos, acordes, transpositor, inspector, progresiones).
