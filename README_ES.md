@@ -147,6 +147,8 @@ Widget visorDeCancion() {
     originalKey: 'C',
     targetKey: 'G', // Transpone automáticamente a Sol Mayor
     showChords: true, // Cambia a false para ocultar acordes y ver solo la letra
+    lineSpacing: 6.0, // Espacio entre líneas consecutivas de un verso
+    stanzaSpacing: 18.0, // Espacio entre estrofas (líneas vacías)
     showDiagramModalOnTap: true, // Abre modal con Guitarra/Ukulele/Piano al pulsar un acorde
   );
 }

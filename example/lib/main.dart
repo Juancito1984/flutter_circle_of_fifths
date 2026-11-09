@@ -203,6 +203,7 @@ And [Am]grace will [G7]lead me [C]home.
       child: ChordSheetViewer(
         showChords: false,
         lineSpacing: 4,
+        stanzaSpacing: 20,
         songText: _sampleSong,
         originalKey: 'C',
         targetKey: selectedModel.major,

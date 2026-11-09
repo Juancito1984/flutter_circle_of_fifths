@@ -13,11 +13,15 @@ class CircleOfFifthsSheet extends StatefulWidget {
   /// Custom localization labels.
   final CircleOfFifthsLabels labels;
 
+  /// Optional callback triggered when a key or scale is selected.
+  final ValueChanged<String>? onKeySelected;
+
   /// Creates a [CircleOfFifthsSheet] bottom sheet widget.
   const CircleOfFifthsSheet({
     super.key,
     this.customTheme = const CircleOfFifthsTheme(),
     this.labels = const CircleOfFifthsLabels(),
+    this.onKeySelected,
     String? title,
     String? interactiveWheelLabel,
     String? summaryViewLabel,
@@ -40,6 +44,7 @@ class CircleOfFifthsSheet extends StatefulWidget {
     String? title,
     String? interactiveWheelLabel,
     String? summaryViewLabel,
+    ValueChanged<String>? onKeySelected,
   }) {
     showModalBottomSheet(
       context: context,
@@ -54,6 +59,7 @@ class CircleOfFifthsSheet extends StatefulWidget {
         title: title,
         interactiveWheelLabel: interactiveWheelLabel,
         summaryViewLabel: summaryViewLabel,
+        onKeySelected: onKeySelected,
       ),
     );
   }
@@ -157,6 +163,9 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                       _selectedIndex = index;
                       _isMinorMode = isMinor;
                     });
+                    final m = CircleOfFifthsModel.defaultKeys[index];
+                    final keyName = isMinor ? '${m.minor}m' : m.major;
+                    widget.onKeySelected?.call(keyName);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -191,6 +200,7 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
                           _isMinorMode = false;
                           _selectedView = 0;
                         });
+                        widget.onKeySelected?.call(item.major);
                       },
                       child: Container(
                         padding: const EdgeInsets.all(12),

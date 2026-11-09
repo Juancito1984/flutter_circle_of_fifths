@@ -71,6 +71,10 @@ class ChordSheetViewer extends StatefulWidget {
   /// Vertical spacing between consecutive song lines (interlineado entre versos).
   final double lineSpacing;
 
+  /// Vertical spacing between verses/stanzas (separación entre estrofas/líneas vacías).
+  /// Defaults to `16.0`.
+  final double stanzaSpacing;
+
   /// Vertical spacing between chord badge and lyric text underneath.
   final double chordToLyricSpacing;
 
@@ -95,6 +99,7 @@ class ChordSheetViewer extends StatefulWidget {
     this.wordSpacing = 4.0,
     this.lineRunSpacing = 8.0,
     this.lineSpacing = 8.0,
+    this.stanzaSpacing = 16.0,
     this.chordToLyricSpacing = 2.0,
   });
 
@@ -428,7 +433,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
 
     switch (line.type) {
       case ChordSheetLineType.empty:
-        return SizedBox(height: widget.lineSpacing * 1.5);
+        return SizedBox(height: widget.stanzaSpacing);
       case ChordSheetLineType.title:
         return Padding(
           padding: const EdgeInsets.only(bottom: 4),

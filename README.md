@@ -147,6 +147,8 @@ Widget buildSongViewer() {
     originalKey: 'C',
     targetKey: 'G', // Transposes chords automatically to G Major
     showChords: true, // Set to false to hide chords and show lyrics only
+    lineSpacing: 6.0, // Space between consecutive lines within a stanza
+    stanzaSpacing: 18.0, // Space between stanzas (empty lines)
     showDiagramModalOnTap: true, // Opens Guitar/Ukulele/Piano modal on chord tap
   );
 }

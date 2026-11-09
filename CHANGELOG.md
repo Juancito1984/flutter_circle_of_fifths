@@ -1,8 +1,9 @@
 ## 1.2.2
 
-* **Control de Interlineado y Espaciado en `ChordSheetViewer`**:
-  * Nueva propiedad `lineSpacing` para controlar el espacio vertical entre líneas/versos de la canción (por defecto `8.0`).
-  * Nueva propiedad `chordToLyricSpacing` para ajustar la distancia entre la etiqueta del acorde y la sílaba de la letra (por defecto `2.0`).
+* **Control de Interlineado y Separación de Estrofas en `ChordSheetViewer`**:
+  * Nueva propiedad `stanzaSpacing` para controlar de forma independiente el espacio vertical entre estrofas (por defecto `16.0`). Evita que al usar un `lineSpacing` bajo las estrofas se junten en un solo bloque.
+  * Propiedad `lineSpacing` para controlar el espacio vertical entre líneas/versos de la canción (por defecto `8.0`).
+  * Propiedad `chordToLyricSpacing` para ajustar la distancia entre la etiqueta del acorde y la sílaba de la letra (por defecto `2.0`).
   * `lineRunSpacing` para el espacio cuando un verso largo se envuelve (*wrap*) en múltiples renglones.
 * **Propiedad `showChords` en `ChordSheetViewer`**:
   * Permite alternar la visualización de los acordes encima de las letras (`true` por defecto).
