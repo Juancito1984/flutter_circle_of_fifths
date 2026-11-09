@@ -182,10 +182,7 @@ class ChordTransposer {
   /// Returns `-1` if the string is not a valid note.
   static int noteToSemitone(String note) {
     if (note.isEmpty) return -1;
-    final clean = note
-        .trim()
-        .replaceAll('♯', '#')
-        .replaceAll('♭', 'b');
+    final clean = note.trim().replaceAll('♯', '#').replaceAll('♭', 'b');
     final normalized = clean.length > 1
         ? '${clean[0].toUpperCase()}${clean.substring(1)}'
         : clean.toUpperCase();
@@ -260,7 +257,10 @@ class ChordTransposer {
     final useFlats = preferFlats ??
         (targetKey != null
             ? prefersFlatsForKey(targetKey)
-            : (root.contains('b') || root.contains('♭') || newRootIndex == 5 || newRootIndex == 10));
+            : (root.contains('b') ||
+                root.contains('♭') ||
+                newRootIndex == 5 ||
+                newRootIndex == 10));
 
     final newRoot = semitoneToNote(newRootIndex, preferFlats: useFlats);
 
@@ -370,8 +370,8 @@ class ChordTransposer {
     final rawRoot = match.group(1)!;
     final quality = match.group(2) ?? '';
     final bassNote = match.group(3);
-    final useFlats =
-        preferFlats ?? (rawRoot.contains('b') || rawRoot.contains('♭') || rawRoot == 'F');
+    final useFlats = preferFlats ??
+        (rawRoot.contains('b') || rawRoot.contains('♭') || rawRoot == 'F');
 
     final rootSemitone = noteToSemitone(rawRoot);
     final normalizedRoot = semitoneToNote(
@@ -399,13 +399,15 @@ class ChordTransposer {
     final (intervals, labels, canonicalQuality) = _intervalsForQuality(quality);
 
     final notes = intervals
-        .map((semi) => semitoneToNote(rootIndex + semi, preferFlats: preferFlats))
+        .map((semi) =>
+            semitoneToNote(rootIndex + semi, preferFlats: preferFlats))
         .toList();
 
     if (bassNote != null && bassNote.isNotEmpty) {
       final bassSemi = noteToSemitone(bassNote);
       if (bassSemi != -1) {
-        final formattedBass = semitoneToNote(bassSemi, preferFlats: preferFlats);
+        final formattedBass =
+            semitoneToNote(bassSemi, preferFlats: preferFlats);
         if (!notes.contains(formattedBass)) {
           notes.insert(0, formattedBass);
         }
