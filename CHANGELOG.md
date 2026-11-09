@@ -9,6 +9,8 @@
 * **Ajuste de Interlineado en `ChordSheetViewer`**:
   * Espaciado vertical entre versos (`lineSpacing`, por defecto `8.0`).
   * Distancia vertical entre acorde y letra (`chordToLyricSpacing`, por defecto `2.0`).
+* **Interacción Mejorada en `CircleOfFifthsWheelWidget`**:
+  * Ahora el callback `onKeySelected` se dispara de manera confiable en cada pulsación sobre cualquier sector, incluso si coincide con el acorde o índice previamente seleccionado, permitiendo confirmar o reasignar la tonalidad sin necesidad de seleccionar primero otro acorde.
 
 ## 1.2.2
 

@@ -94,25 +94,9 @@ And [Am]grace will [G7]lead me [C]home.
       body: IndexedStack(
         index: _currentNavIndex,
         children: [
-          ChordInspectorSheet(
-              initialInstrument: InstrumentType.piano,
-              chordInfo: ChordInfo(
-                  symbol: 'C',
-                  root: 'root',
-                  quality: 'quality',
-                  notes: ['C', 'E', 'G'],
-                  semitoneIntervals: [1, 3, 5],
-                  intervalLabels: ['C', 'E', 'G'],
-                  guitarVoicing: ChordVoicing(
-                      frets: [1, 2, 3],
-                      fingers: [4, 5, 6],
-                      stringNames: ['A', 'B', 'C']),
-                  ukuleleVoicing: ChordVoicing(
-                      frets: [1, 2, 3],
-                      fingers: [4, 5, 6],
-                      stringNames: ['A', 'B', 'C']))),
 
-          /*
+
+
           // 1. Core: Wheel & Diatonic Scale Card
           _buildWheelAndScaleScreen(selectedModel),
 
@@ -128,7 +112,7 @@ And [Am]grace will [G7]lead me [C]home.
           // 5. Module 4: Gregorian Modes & Advanced Scales
           _buildScaleModesScreen(selectedModel.major),
 
-           */
+
         ],
       ),
       bottomNavigationBar: NavigationBar(

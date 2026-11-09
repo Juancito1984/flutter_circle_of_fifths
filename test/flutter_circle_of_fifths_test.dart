@@ -162,6 +162,35 @@ That [C]saved a [G7]wretch like [C]me
       );
 
       expect(find.byType(CircleOfFifthsWheelWidget), findsOneWidget);
+
+      // Tap near top (12:00) where C Major is located
+      int tapCount = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: CircleOfFifthsWheelWidget(
+                  selectedIndex: 0,
+                  isMinorMode: false,
+                  onKeySelected: (index, isMinor) {
+                    tapCount++;
+                    expect(index, 0);
+                    expect(isMinor, false);
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Tap at the outer major ring at 12:00 (x: 150, y: 25)
+      await tester.tapAt(tester.getCenter(find.byType(CircleOfFifthsWheelWidget)) - const Offset(0, 125));
+      await tester.pump();
+      expect(tapCount, 1);
     });
 
     testWidgets('ScaleDetailCard renders scale details for C Major',

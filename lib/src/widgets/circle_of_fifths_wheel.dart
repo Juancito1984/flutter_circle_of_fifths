@@ -61,10 +61,7 @@ class _CircleOfFifthsWheelWidgetState extends State<CircleOfFifthsWheelWidget> {
     final visSector = (angleFromTop / sectorAngle).floor() % 12;
     final targetIndex = (visSector + widget.selectedIndex) % 12;
 
-    if (targetIndex != widget.selectedIndex ||
-        isMinorTap != widget.isMinorMode) {
-      widget.onKeySelected(targetIndex, isMinorTap);
-    }
+    widget.onKeySelected(targetIndex, isMinorTap);
   }
 
   @override
