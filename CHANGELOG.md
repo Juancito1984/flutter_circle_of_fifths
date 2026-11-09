@@ -1,3 +1,14 @@
+## 1.3.1
+
+* **Interacción Mejorada en `CircleOfFifthsWheelWidget`**:
+  * El callback `onKeySelected` ahora se dispara de manera confiable en cada pulsación sobre cualquier sector, incluso si coincide con el acorde previamente seleccionado, permitiendo confirmar o reasignar la tonalidad sin necesidad de seleccionar primero otro acorde.
+* **Portal de Documentación Oficial Bilingüe (`doc/`)**:
+  * Nueva documentación técnica modular completa en español (`doc/es/`) e inglés (`doc/en/`) con guías individuales, tablas de propiedades y ejemplos interactivos para los 9 widgets de la suite.
+  * Aclaración del funcionamiento desacoplado de la síntesis de sonido (`SimpleAudioSynthesizer`) en los widgets instrumentales para mantener 0 dependencias nativas en la librería.
+* **Mejoras en la Aplicación de Ejemplo (`example/`)**:
+  * Demostración en vivo de teclado de piano con reproducción sonora en tiempo real conectando `SimpleAudioSynthesizer` con `audioplayers`.
+  * Corrección de desbordamiento horizontal (`RenderFlex overflow`) en la cabecera interactiva del piano.
+
 ## 1.3.0
 
 * **Propiedad `showChords` en `ChordSheetViewer`**:
@@ -9,8 +20,6 @@
 * **Ajuste de Interlineado en `ChordSheetViewer`**:
   * Espaciado vertical entre versos (`lineSpacing`, por defecto `8.0`).
   * Distancia vertical entre acorde y letra (`chordToLyricSpacing`, por defecto `2.0`).
-* **Interacción Mejorada en `CircleOfFifthsWheelWidget`**:
-  * Ahora el callback `onKeySelected` se dispara de manera confiable en cada pulsación sobre cualquier sector, incluso si coincide con el acorde o índice previamente seleccionado, permitiendo confirmar o reasignar la tonalidad sin necesidad de seleccionar primero otro acorde.
 
 ## 1.2.2
 

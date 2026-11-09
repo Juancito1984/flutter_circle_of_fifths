@@ -19,9 +19,9 @@ El widget **`ScaleModesWidget`** es un explorador teórico y sonoro interactivo 
 3. **Análisis de Fórmula y Notas Derivadas**:
    * Muestra la estructura de tonos y semitonos (ej: T - T - S - T - T - T - S) y las notas exactas generadas a partir de la tónica seleccionada.
 4. **Teclado de Piano Integrado (`showPianoKeyboard`)**:
-   * Resalta visualmente las teclas de la escala en un teclado y permite tocar las notas individualmente.
-5. **Reproducción de Escala Ascendente**:
-   * Botón para escuchar la escala tocada nota por nota de grave a agudo en audio sintetizado.
+   * Resalta visualmente las teclas de la escala en un teclado interactivo.
+5. **Generación de Frecuencias de la Escala**:
+   * Permite generar las frecuencias y ondas sonoras de la escala en orden ascendente mediante `SimpleAudioSynthesizer` para reproducirlas con cualquier backend de audio.
 6. **Localización e Idiomas (i18n)**:
    * Compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para mostrar nombres de modos y explicaciones teóricas en español.
 

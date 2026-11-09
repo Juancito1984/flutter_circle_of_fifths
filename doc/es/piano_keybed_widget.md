@@ -14,8 +14,9 @@ El widget **`PianoKeybedWidget`** es un teclado visual e interactivo de piano qu
 3. **Etiquetas de Teclas (`showNoteLabels`)**:
    * Muestra el nombre de la nota en cada tecla activa (`C`, `D`, `E`, etc.).
    * Soporta preferencia por bemoles (`preferFlats: true` para mostrar `Db`, `Eb`, `Gb`, `Ab`, `Bb`).
-4. **Interacción Táctil y Síntesis Sonora (`onNoteTap`)**:
-   * Permite escuchar el tono de cada tecla tocada con audio sintetizado puro o conectar una lógica personalizada de eventos.
+4. **Interacción Táctil Desacoplada (`onNoteTap`)**:
+   * Detecta toques en cada tecla individual y entrega la nota pulsada (ej. `'C4'`, `'G4'`).
+   * Para mantener la librería libre de dependencias nativas y con 160/160 puntos en pub.dev, el widget no fuerza un reproductor nativo. Puedes conectar directamente el sintetizador en memoria incluido ([`SimpleAudioSynthesizer`](../../lib/src/audio/simple_audio_synthesizer.dart)) con tu reproductor de audio preferido (`audioplayers`, `just_audio`, etc.).
 
 ---
 
@@ -35,14 +36,37 @@ El widget **`PianoKeybedWidget`** es un teclado visual e interactivo de piano qu
 
 ## 💻 Ejemplos de Uso
 
-### 1. Acorde de Do Mayor (C - E - G) en 2 Octavas
+### 1. Acorde de Do Mayor (C - E - G) con Reproducción de Audio
 
 ```dart
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
-class PianoChordDemo extends StatelessWidget {
+class PianoChordDemo extends StatefulWidget {
   const PianoChordDemo({super.key});
+
+  @override
+  State<PianoChordDemo> createState() => _PianoChordDemoState();
+}
+
+class _PianoChordDemoState extends State<PianoChordDemo> {
+  final AudioPlayer _player = AudioPlayer();
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playNote(String note) async {
+    // Genera la onda sonora PCM WAV en memoria sin plugins C++
+    final wavBytes = SimpleAudioSynthesizer.synthesizeChordNotes([note]);
+    if (wavBytes.isNotEmpty) {
+      await _player.stop();
+      await _player.play(BytesSource(wavBytes));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +79,7 @@ class PianoChordDemo extends StatelessWidget {
           octaves: 2,
           showNoteLabels: true,
           height: 140,
-          onNoteTap: (note) {
-            debugPrint('Tecla pulsada: $note');
-          },
+          onNoteTap: (note) => _playNote(note),
         ),
       ),
     );

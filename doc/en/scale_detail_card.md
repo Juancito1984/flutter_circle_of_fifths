@@ -13,7 +13,7 @@ The **`ScaleDetailCard`** widget is a comprehensive theoretical breakdown card t
 3. **One-Tap Chord Inspection (`enableChordTap`)**:
    * Tapping any scale degree button pops up [`ChordInspectorSheet`](chord_inspector_sheet.md) with Guitar, Ukulele, and Piano voicings.
 4. **Interactive Piano Keybed (`showPianoScale`)**:
-   * Renders a piano keyboard highlighting the active scale notes with pure Dart sound synthesis.
+   * Renders a piano keyboard highlighting the active scale notes with key touch support.
 5. **Major and Minor Scale Support**:
    * Adapts scale notes and intervals dynamically when `isMinorMode: true`.
 

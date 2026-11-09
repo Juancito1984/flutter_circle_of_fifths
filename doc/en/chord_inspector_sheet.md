@@ -14,8 +14,8 @@ The **`ChordInspectorSheet`** widget is an interactive modal sheet designed for 
    * **Guitar**: 6-string fretboard with barres, finger numbers, and muted/open strings.
    * **Ukulele**: 4-string fretboard in standard G-C-E-A tuning with recommended fingerings.
    * **Piano**: 2-octave keybed highlighting pressed keys with note labels.
-4. **Real-Time Sound Synthesis**:
-   * Features a play button to hear the chord played as an arpeggiated or strummed acoustic voicing.
+4. **Modular Sound Synthesis (`SimpleAudioSynthesizer`)**:
+   * Computes the chord frequencies and uncompressed PCM WAV audio in memory via `SimpleAudioSynthesizer`, allowing developers to play it through any audio engine without bloat.
 5. **Localization (i18n)**:
    * Compatible with [`CircleOfFifthsLabels`](../../lib/src/theme/circle_of_fifths_labels.dart) to customize instrument tabs and headers.
 

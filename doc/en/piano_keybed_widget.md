@@ -14,8 +14,9 @@ The **`PianoKeybedWidget`** is an interactive vector piano keyboard that renders
 3. **Note Key Labels (`showNoteLabels`)**:
    * Renders note names on active keys (`C`, `D`, `E`, etc.).
    * Supports flat preference (`preferFlats: true` to display `Db`, `Eb`, `Gb`, `Ab`, `Bb`).
-4. **Touch Interaction & Sound (`onNoteTap`)**:
-   * Play any piano key with built-in pure Dart sound synthesis or attach custom interactive logic.
+4. **Decoupled Touch Interaction (`onNoteTap`)**:
+   * Detects precise key taps and provides the played note (e.g., `'C4'`, `'G4'`).
+   * To keep this package 100% pure Dart and maintain 160/160 pub points without native audio dependencies, you can route `onNoteTap` directly to the included in-memory synthesizer ([`SimpleAudioSynthesizer`](../../lib/src/audio/simple_audio_synthesizer.dart)) using your preferred audio backend (`audioplayers`, `just_audio`, etc.).
 
 ---
 
@@ -35,14 +36,37 @@ The **`PianoKeybedWidget`** is an interactive vector piano keyboard that renders
 
 ## 💻 Code Examples
 
-### 1. C Major Triad (C - E - G) on 2 Octaves
+### 1. C Major Triad (C - E - G) with Audio Playback
 
 ```dart
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
-class PianoChordDemo extends StatelessWidget {
+class PianoChordDemo extends StatefulWidget {
   const PianoChordDemo({super.key});
+
+  @override
+  State<PianoChordDemo> createState() => _PianoChordDemoState();
+}
+
+class _PianoChordDemoState extends State<PianoChordDemo> {
+  final AudioPlayer _player = AudioPlayer();
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playNote(String note) async {
+    // Generate pure PCM WAV bytes in memory
+    final wavBytes = SimpleAudioSynthesizer.synthesizeChordNotes([note]);
+    if (wavBytes.isNotEmpty) {
+      await _player.stop();
+      await _player.play(BytesSource(wavBytes));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +79,7 @@ class PianoChordDemo extends StatelessWidget {
           octaves: 2,
           showNoteLabels: true,
           height: 140,
+          onNoteTap: (note) => _playNote(note),
         ),
       ),
     );

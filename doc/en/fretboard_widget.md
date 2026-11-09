@@ -16,8 +16,8 @@ The **`FretboardWidget`** is a vector diagram component that paints accurate fre
    * **Starting Fret**: Renders position labels (e.g., `3fr` or `5fr`) when voicing is played higher up the neck.
 3. **Instantiate from Chord Symbol (`FretboardWidget.fromChord`)**:
    * Create a diagram directly from a string symbol like `'Am'`, `'G7'`, or `'F#m'`.
-4. **Pure Dart Audio Playback**:
-   * Tap to listen to the chord strummed via synthesized acoustic frequencies.
+4. **Ready for Pure Dart Synthesis (`SimpleAudioSynthesizer`)**:
+   * To play the chord sound, pair [`SimpleAudioSynthesizer.synthesizeWav`](../../lib/src/audio/simple_audio_synthesizer.dart) or `synthesizeChordNotes` with your chosen audio plugin (`audioplayers`, `just_audio`), keeping the core package completely zero-dependency.
 
 ---
 

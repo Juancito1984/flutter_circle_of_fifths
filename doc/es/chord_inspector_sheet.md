@@ -14,8 +14,8 @@ El widget **`ChordInspectorSheet`** es un panel modal interactivo diseñado para
    * **Guitarra**: Mástil de 6 cuerdas con cejillas, cuerdas muteadas y número de dedos.
    * **Ukelele**: Mástil de 4 cuerdas afinado en G-C-E-A estándar con digitación recomendada.
    * **Piano**: Teclado de 2 octavas con las teclas pulsadas iluminadas y etiquetas de notas.
-4. **Reproducción de Audio en Tiempo Real**:
-   * Incluye un botón para reproducir el acorde completo sintetizado armónicamente.
+4. **Síntesis Sonora Modular (`SimpleAudioSynthesizer`)**:
+   * Genera los tonos y armónicos puros del acorde en memoria a través de `SimpleAudioSynthesizer`, permitiendo al desarrollador reproducirlo fácilmente con su backend de audio preferido.
 5. **Completamente Localizable (i18n)**:
    * Compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para traducir las pestañas de instrumentos y etiquetas teóricas.
 

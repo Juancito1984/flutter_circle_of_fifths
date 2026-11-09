@@ -16,8 +16,8 @@ El widget **`FretboardWidget`** es un componente de dibujo vectorial que genera 
    * **Traste Inicial**: Muestra el indicador del traste en el que comienza el acorde si no está en la primera posición (por ejemplo, `3fr` o `5fr`).
 3. **Constructor Directo desde Símbolo (`FretboardWidget.fromChord`)**:
    * Permite instanciar el diagrama pasando únicamente el nombre del acorde (`'Am'`, `'G7'`, etc.) sin necesidad de calcular manualmente las posiciones.
-4. **Reproducción de Audio**:
-   * Integra botón para reproducir el arpegio o rasgueo del acorde sintetizado en frecuencias exactas.
+4. **Listo para Sonido Sintetizado (`SimpleAudioSynthesizer`)**:
+   * Para reproducir el sonido del acorde en tu app, utiliza [`SimpleAudioSynthesizer.synthesizeWav`](../../lib/src/audio/simple_audio_synthesizer.dart) o `synthesizeChordNotes` con tu reproductor de audio preferido (`audioplayers`, `just_audio`), manteniendo la suite libre de dependencias nativas obligatorias.
 
 ---
 

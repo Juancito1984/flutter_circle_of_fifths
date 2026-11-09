@@ -19,9 +19,9 @@ The **`ScaleModesWidget`** is an interactive theoretical explorer for the **7 Gr
 3. **Formula & Note Derivation**:
    * Displays whole/half step intervals (e.g. W - W - H - W - W - W - H) and the exact spelled notes derived from the selected root.
 4. **Integrated Piano Keyboard (`showPianoKeyboard`)**:
-   * Highlights scale notes on a piano keybed with individual key touch response.
-5. **Ascending Scale Audio Playback**:
-   * Listen to the complete scale played note-by-note upward using pure Dart audio synthesis.
+   * Highlights scale notes on an interactive piano keybed.
+5. **Scale Audio Synthesis**:
+   * Generates ascending scale frequencies and WAV audio via `SimpleAudioSynthesizer` for playback with any audio engine.
 
 ---
 

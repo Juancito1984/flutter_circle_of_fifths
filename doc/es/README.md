@@ -50,7 +50,7 @@ Agrega la dependencia en tu archivo `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.3.0
+  flutter_circle_of_fifths: ^1.3.1
 ```
 
 Ejecuta en la terminal:

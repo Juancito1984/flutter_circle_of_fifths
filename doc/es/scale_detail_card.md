@@ -11,9 +11,9 @@ El widget **`ScaleDetailCard`** es una tarjeta informativa completa y modular qu
 2. **Identificación de Calidad Armónica**:
    * Distingue visualmente entre acordes mayores, menores y disminuidos correspondientes a cada grado armónico.
 3. **Inspección de Acordes al Tocar (`enableChordTap`)**:
-   * Al pulsar sobre cualquiera de los grados, despliega automáticamente el modal de digitaciones ([`ChordInspectorSheet`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/docs/chord_inspector_sheet.md)) para Guitarra, Ukelele y Piano.
+   * Al pulsar sobre cualquiera de los grados, despliega automáticamente el modal de digitaciones ([`ChordInspectorSheet`](chord_inspector_sheet.md)) para Guitarra, Ukelele y Piano.
 4. **Teclado de Piano Opcional (`showPianoScale`)**:
-   * Puede incrustar un mini-teclado interactivo de piano que resalta las notas diatónicas de la escala y permite escucharlas mediante síntesis de audio integrada.
+   * Puede incrustar un mini-teclado interactivo de piano que resalta las notas diatónicas de la escala y expone toques interactivos en las teclas.
 5. **Soporte para Modo Menor Relativo**:
    * Al cambiar `isMinorMode: true`, adapta las notas, grados y fórmulas para la escala menor natural.
 

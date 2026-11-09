@@ -17,8 +17,8 @@ The **`ProgressionBuilderWidget`** is an interactive laboratory for analyzing, b
    * Automatically resolves generic degrees into concrete chords for the chosen key (e.g. in `C`, `I` = `C`, `V` = `G`; in `G`, `I` = `G`, `V` = `D`).
 3. **Passing Chords & Modulation Suggestions**:
    * Suggests secondary dominants (`V/V`, `V/vi`) and borrowed modal interchange chords.
-4. **Rhythmic Progression Player**:
-   * Listen to the progression measure by measure with synchronized synthesized chord audio.
+4. **Harmonic Analysis & Audio Synthesis**:
+   * Breaks down each measure and allows synthesizing chords into WAV bytes using `SimpleAudioSynthesizer` or inspecting voicings.
 5. **One-Tap Voicing Inspection**:
    * Tapping any progression step opens [`ChordInspectorSheet`](chord_inspector_sheet.md) with Guitar, Ukulele, and Piano diagrams.
 

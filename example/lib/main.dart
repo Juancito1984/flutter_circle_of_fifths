@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
@@ -48,6 +49,29 @@ class _MainMusicStudioScreenState extends State<MainMusicStudioScreen> {
   int _currentNavIndex = 0;
   int _selectedKeyIndex = 0; // 0 = 'C'
   bool _isMinorMode = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playNote(String note) async {
+    final wavBytes = SimpleAudioSynthesizer.synthesizeChordNotes([note]);
+    if (wavBytes.isNotEmpty) {
+      await _audioPlayer.stop();
+      await _audioPlayer.play(BytesSource(wavBytes));
+    }
+  }
+
+  Future<void> _playChord(List<String> notes) async {
+    final wavBytes = SimpleAudioSynthesizer.synthesizeChordNotes(notes);
+    if (wavBytes.isNotEmpty) {
+      await _audioPlayer.stop();
+      await _audioPlayer.play(BytesSource(wavBytes));
+    }
+  }
 
   static const String _sampleSong = '''
 {title: Amazing Grace}
@@ -94,9 +118,6 @@ And [Am]grace will [G7]lead me [C]home.
       body: IndexedStack(
         index: _currentNavIndex,
         children: [
-
-
-
           // 1. Core: Wheel & Diatonic Scale Card
           _buildWheelAndScaleScreen(selectedModel),
 
@@ -111,8 +132,6 @@ And [Am]grace will [G7]lead me [C]home.
 
           // 5. Module 4: Gregorian Modes & Advanced Scales
           _buildScaleModesScreen(selectedModel.major),
-
-
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -243,6 +262,60 @@ And [Am]grace will [G7]lead me [C]home.
           const SizedBox(height: 16),
           ChordInspectorSheet(
             chordInfo: chordInfo,
+          ),
+          const SizedBox(height: 24),
+          Card(
+            elevation: 0,
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.5),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Piano Interactivo con Sonido',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.tonalIcon(
+                        icon: const Icon(Icons.volume_up_rounded, size: 18),
+                        label: Text('Tocar ${chordInfo.symbol}'),
+                        onPressed: () => _playChord(chordInfo.notes),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Toca cualquier tecla del piano para escuchar su tono sintetizado:',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  PianoKeybedWidget(
+                    highlightedNotes: chordInfo.notes,
+                    rootNote: chordInfo.root,
+                    octaves: 2,
+                    height: 140,
+                    showNoteLabels: true,
+                    preferFlats: chordInfo.root.contains('b'),
+                    onNoteTap: (note) => _playNote(note),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

@@ -17,8 +17,8 @@ El widget **`ProgressionBuilderWidget`** es un laboratorio interactivo para el a
    * Traduce automáticamente cada grado numérico al acorde real correspondiente a la tonalidad activa (ejemplo: en `C`, `I` = `C`, `V` = `G`; en `G`, `I` = `G`, `V` = `D`).
 3. **Acordes de Paso y Modulaciones Sugeridas**:
    * Sugiere acordes de intercambio modal y dominantes secundarios (`V/V`, `V/vi`, acordes prestados).
-4. **Reproductor Rítmico Secuencial**:
-   * Incluye controles para reproducir la progresión compás a compás con síntesis de audio integrada, permitiendo escuchar cómo resuelve armónicamente.
+4. **Análisis Armónico y Síntesis Lista**:
+   * Desglosa cada paso en tiempo real y permite generar el sonido de cada acorde mediante `SimpleAudioSynthesizer` o inspeccionar su digitación.
 5. **Inspección de Digitaciones al Tocar**:
    * Cada acorde de la progresión puede tocarse para abrir sus diagramas de digitación para Guitarra, Ukelele y Piano.
 6. **Localización e Idioma (i18n)**:
