@@ -1,6 +1,6 @@
 # 📜 CircleOfFifthsSheet
 
-El widget **`CircleOfFifthsSheet`** es un panel modal inferior deslizable (*Modal Bottom Sheet*) listo para usar que reúne la rueda interactiva ([`CircleOfFifthsWheelWidget`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/docs/circle_of_fifths_wheel.md)), la tarjeta detallada de la escala ([`ScaleDetailCard`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/docs/scale_detail_card.md)) y una vista resumen en cuadrícula.
+El widget **`CircleOfFifthsSheet`** es un panel modal inferior deslizable (*Modal Bottom Sheet*) listo para usar que reúne la rueda interactiva ([`CircleOfFifthsWheelWidget`](circle_of_fifths_wheel.md)), la tarjeta detallada de la escala ([`ScaleDetailCard`](scale_detail_card.md)) y una vista resumen en cuadrícula.
 
 ---
 
@@ -14,7 +14,7 @@ El widget **`CircleOfFifthsSheet`** es un panel modal inferior deslizable (*Moda
 3. **Tarjeta de Escala Integrada**:
    * Debajo de la rueda muestra automáticamente el desglose de grados (I al VII), acordes y piano.
 4. **Localización e Idiomas Sencillos**:
-   * Permite pasar directamente cadenas para `title`, `interactiveWheelLabel` y `summaryViewLabel`, o bien un objeto completo [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) como `CircleOfFifthsLabels.spanish`.
+   * Permite pasar directamente cadenas para `title`, `interactiveWheelLabel` y `summaryViewLabel`, o bien un objeto completo `CircleOfFifthsLabels` como `CircleOfFifthsLabels.spanish`.
 5. **Comportamiento Deslizable Responsivo**:
    * Basado en `DraggableScrollableSheet` con tamaños configurados para pantallas de teléfonos y tabletas.
 

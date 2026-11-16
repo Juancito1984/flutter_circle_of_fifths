@@ -19,9 +19,9 @@ El widget **`ChordSheetViewer`** es un visor musical de alto rendimiento diseña
    * Permite alternar entre la vista con cifrado y la vista de solo letra.
    * Al estar en `showChords: false`, renderiza la canción como un bloque de texto continuo optimizado para lectura y selección nativa.
 5. **Inspector de Acordes Integrado**:
-   * Al tocar cualquier acorde, se despliega automáticamente un modal interactivo ([`ChordInspectorSheet`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/widgets/chord_inspector_sheet.dart)) con diagramas de digitación para **Guitarra**, **Ukelele** y **Piano**, junto con síntesis de audio.
+   * Al tocar cualquier acorde, se despliega automáticamente un modal interactivo ([`ChordInspectorSheet`](chord_inspector_sheet.md)) con diagramas de digitación para **Guitarra**, **Ukelele** y **Piano**, junto con síntesis de audio.
 6. **Soporte Completo de Internacionalización (i18n)**:
-   * Compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para personalizar o traducir todos los textos del visor y de la barra de transposición.
+   * Compatible con `CircleOfFifthsLabels` para personalizar o traducir todos los textos del visor y de la barra de transposición.
 
 ---
 

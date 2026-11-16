@@ -22,7 +22,7 @@ El widget **`ProgressionBuilderWidget`** es un laboratorio interactivo para el a
 5. **Inspección de Digitaciones al Tocar**:
    * Cada acorde de la progresión puede tocarse para abrir sus diagramas de digitación para Guitarra, Ukelele y Piano.
 6. **Localización e Idioma (i18n)**:
-   * Totalmente compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para traducir las sugerencias, categorías y botones.
+   * Totalmente compatible con `CircleOfFifthsLabels` para traducir las sugerencias, categorías y botones.
 
 ---
 

@@ -17,7 +17,7 @@ El widget **`ChordInspectorSheet`** es un panel modal interactivo diseñado para
 4. **Síntesis Sonora Modular (`SimpleAudioSynthesizer`)**:
    * Genera los tonos y armónicos puros del acorde en memoria a través de `SimpleAudioSynthesizer`, permitiendo al desarrollador reproducirlo fácilmente con su backend de audio preferido.
 5. **Completamente Localizable (i18n)**:
-   * Compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para traducir las pestañas de instrumentos y etiquetas teóricas.
+   * Compatible con `CircleOfFifthsLabels` para traducir las pestañas de instrumentos y etiquetas teóricas.
 
 ---
 

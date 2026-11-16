@@ -3,7 +3,7 @@ description: "Demonstration application for flutter_circle_of_fifths package."
 publish_to: "none"
 
 environment:
-  sdk: ^3.0.0
+  sdk: ^3.14.0
 
 dependencies:
   flutter:

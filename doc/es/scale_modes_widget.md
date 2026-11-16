@@ -23,7 +23,7 @@ El widget **`ScaleModesWidget`** es un explorador teórico y sonoro interactivo 
 5. **Generación de Frecuencias de la Escala**:
    * Permite generar las frecuencias y ondas sonoras de la escala en orden ascendente mediante `SimpleAudioSynthesizer` para reproducirlas con cualquier backend de audio.
 6. **Localización e Idiomas (i18n)**:
-   * Compatible con [`CircleOfFifthsLabels`](file:///C:/Users/ingej/StudioProjects/flutter_circle_of_fifths/lib/src/theme/circle_of_fifths_labels.dart) para mostrar nombres de modos y explicaciones teóricas en español.
+   * Compatible con `CircleOfFifthsLabels` para mostrar nombres de modos y explicaciones teóricas en español.
 
 ---
 

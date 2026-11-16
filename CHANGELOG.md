@@ -1,3 +1,11 @@
+## 1.3.2
+
+* **Soporte y Certificación con Flutter 3.50+ / Dart 3.14+**:
+  * Compatibilidad certificada con Flutter 3.50.0 y Dart 3.14+ manteniendo un rango de SDK amplio y accesible (`sdk: ">=3.0.0 <4.0.0"` y `flutter: ">=3.10.0"`).
+  * Modernización completa de la app de demostración (`example/`): Gradle Wrapper elevado a **9.5.0**, Android Gradle Plugin (AGP) a **9.3.1** y Kotlin Android a **2.4.20**.
+  * Configuración optimizada de análisis estático en `analysis_options.yaml` asegurando 0 advertencias y compatibilidad hacia adelante.
+  * Verificación y pase exitoso del 100% de las pruebas unitarias y de widgets.
+
 ## 1.3.1
 
 * **Interacción Mejorada en `CircleOfFifthsWheelWidget`**:
