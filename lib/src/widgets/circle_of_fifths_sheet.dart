@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import '../theme/circle_of_fifths_theme.dart';
@@ -91,8 +91,10 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        return Material(
+          type: MaterialType.transparency,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: ListView(
             controller: scrollController,
             children: [
@@ -269,7 +271,8 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
               const SizedBox(height: 24),
             ],
           ),
-        );
+        ),
+      );
       },
     );
   }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import 'fretboard_widget.dart';
@@ -70,9 +70,11 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
     final info = widget.chordInfo;
     final labels = widget.labels;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
         // Drag handle
         Container(
           width: 40,
@@ -213,7 +215,8 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
           child: _buildInstrumentDiagram(info),
         ),
       ],
-    );
+    ),
+  );
   }
 
   Widget _buildInstrumentDiagram(ChordInfo info) {

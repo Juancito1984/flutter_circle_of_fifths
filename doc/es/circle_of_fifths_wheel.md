@@ -36,7 +36,7 @@ El widget **`CircleOfFifthsWheelWidget`** es el componente visual central de la 
 ### 1. Integración en un StatefulWidget
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class WheelDemoPage extends StatefulWidget {
@@ -93,11 +93,11 @@ CircleOfFifthsWheelWidget(
       _isMinor = isMinor;
     });
   },
-  customTheme: const CircleOfFifthsTheme(
-    brandTitle: 'MI APP',
-    primarySelectedColor: Colors.deepPurple,
-    diatonicFamilyColor: Colors.purpleAccent,
-    textColor: Colors.white,
+  customTheme: CircleOfFifthsTheme(
+    centerLabel: 'REMANENTE',
+    centerLabelColor: Theme.of(context).colorScheme.primary,
+    tonicColor: Theme.of(context).colorScheme.primary,
+    subdominantDominantColor: Theme.of(context).colorScheme.secondary,
   ),
 )
 ```

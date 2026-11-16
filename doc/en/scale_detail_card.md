@@ -28,6 +28,10 @@ The **`ScaleDetailCard`** widget is a comprehensive theoretical breakdown card t
 | **`showPianoScale`** | `bool` | `false` | Whether to render an interactive piano keyboard highlighting scale notes. |
 | **`enableChordTap`** | `bool` | `true` | Enables tapping scale degrees to inspect their chord diagrams in instruments. |
 | **`labels`** | `CircleOfFifthsLabels` | `CircleOfFifthsLabels()` | Localization instance for section headers and degree descriptions. |
+| **`backgroundColor`** | `Color?` | `null` | Background color for the card container. Automatically adapts to brightness (`surfaceContainerLowest` in light, `surfaceContainerHigh` in dark). |
+| **`primaryColor`** | `Color?` | `null` | Primary accent color for title, note names, and tonic highlights. Defaults to `colorScheme.primary`. |
+| **`secondaryColor`** | `Color?` | `null` | Secondary color for interval labels and connector arrows. Defaults to `colorScheme.secondary`. |
+| **`borderColor`** | `Color?` | `null` | Border outline color. Defaults to `colorScheme.outlineVariant` with subtle opacity. |
 
 ---
 
@@ -36,7 +40,7 @@ The **`ScaleDetailCard`** widget is a comprehensive theoretical breakdown card t
 ### 1. Embedded Scale Card
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class ScaleOverviewPage extends StatelessWidget {

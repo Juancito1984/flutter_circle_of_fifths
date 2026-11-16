@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 import '../models/chord_sheet_parser.dart';
 import '../models/circle_of_fifths_model.dart';
@@ -59,6 +59,10 @@ class ChordSheetViewer extends StatefulWidget {
   /// Custom text style for chord badges above lyrics.
   final TextStyle? chordStyle;
 
+  /// Optional background color for the chord badge container.
+  /// If null, defaults to [ColorScheme.primaryContainer].
+  final Color? chordBackgroundColor;
+
   /// Custom text style for section headers (`[Verse]`, `[Chorus]`).
   final TextStyle? sectionStyle;
 
@@ -95,6 +99,7 @@ class ChordSheetViewer extends StatefulWidget {
     this.onTransposeChanged,
     this.lyricStyle,
     this.chordStyle,
+    this.chordBackgroundColor,
     this.sectionStyle,
     this.wordSpacing = 4.0,
     this.lineRunSpacing = 8.0,
@@ -170,8 +175,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
   }
 
   void _handleChordTap(String chordSymbol) {
-    final preferFlats =
-        ChordTransposer.prefersFlatsForKey(_selectedTargetKey);
+    final preferFlats = ChordTransposer.prefersFlatsForKey(_selectedTargetKey);
     final info = ChordTransposer.parseChord(
       chordSymbol,
       preferFlats: preferFlats,
@@ -225,28 +229,31 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
         ) ??
         const TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.showChords && widget.showTranspositionBar) ...[
-          _buildTranspositionToolbar(context, effectiveKey),
-          const SizedBox(height: 12),
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.showChords && widget.showTranspositionBar) ...[
+            _buildTranspositionToolbar(context, effectiveKey),
+            const SizedBox(height: 12),
+          ],
+          if (widget.showChords &&
+              widget.showChordSummaryBar &&
+              doc.uniqueChords.isNotEmpty) ...[
+            _buildUniqueChordsBar(context, doc.uniqueChords),
+            const SizedBox(height: 16),
+          ],
+          for (final line in doc.lines)
+            _buildLine(
+              context,
+              line,
+              lyricStyle: defaultLyricStyle,
+              chordStyle: defaultChordStyle,
+              sectionStyle: defaultSectionStyle,
+            ),
         ],
-        if (widget.showChords &&
-            widget.showChordSummaryBar &&
-            doc.uniqueChords.isNotEmpty) ...[
-          _buildUniqueChordsBar(context, doc.uniqueChords),
-          const SizedBox(height: 16),
-        ],
-        for (final line in doc.lines)
-          _buildLine(
-            context,
-            line,
-            lyricStyle: defaultLyricStyle,
-            chordStyle: defaultChordStyle,
-            sectionStyle: defaultSectionStyle,
-          ),
-      ],
+      ),
     );
   }
 
@@ -258,10 +265,10 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     final textTheme = Theme.of(context).textTheme;
     final labels = widget.labels;
 
-    final semitoneLabel =
-        _semitones > 0 ? '+$_semitones' : '$_semitones';
+    final semitoneLabel = _semitones > 0 ? '+$_semitones' : '$_semitones';
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHigh,
@@ -270,15 +277,13 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 8,
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          // Semitone stepper
-          Row(
-            mainAxisSize: MainAxisSize.min,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 460;
+
+          final semitoneStepper = Row(
+            mainAxisSize:
+                isCompact ? MainAxisSize.max : MainAxisSize.min,
             children: [
               Icon(
                 Icons.swap_vert_circle_outlined,
@@ -292,7 +297,12 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 6),
+              if (isCompact) const Spacer() else const SizedBox(width: 6),
+              if (_semitones != 0)
+                TextButton(
+                  onPressed: () => _updateTranspose(0),
+                  child: Text(labels.resetLabel),
+                ),
               IconButton.filledTonal(
                 visualDensity: VisualDensity.compact,
                 onPressed: () => _updateTranspose(_semitones - 1),
@@ -317,17 +327,52 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                 icon: const Icon(Icons.add_rounded, size: 18),
                 tooltip: '+1 Semitone',
               ),
-              if (_semitones != 0)
-                TextButton(
-                  onPressed: () => _updateTranspose(0),
-                  child: Text(labels.resetLabel),
-                ),
-            ],
-          ),
 
-          // Circle of Fifths Target Key Selector
-          Row(
-            mainAxisSize: MainAxisSize.min,
+            ],
+          );
+
+          final dropdownBox = Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: DropdownButton<String>(
+              isDense: true,
+              isExpanded: isCompact,
+              value: CircleOfFifthsModel.defaultKeys.any(
+                (k) => k.major == effectiveKey,
+              )
+                  ? effectiveKey
+                  : CircleOfFifthsModel.defaultKeys.first.major,
+              dropdownColor: colorScheme.surfaceContainerHighest,
+              style: textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onPrimaryContainer,
+              ),
+              items: CircleOfFifthsModel.defaultKeys.map((model) {
+                return DropdownMenuItem<String>(
+                  value: model.major,
+                  child: Text(
+                    '${model.major} / ${model.minor}m (${model.keySignature})',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              onChanged: (newKey) {
+                if (newKey != null) {
+                  _selectCircleKey(newKey);
+                }
+              },
+            ),
+          );
+
+          final keySelector = Row(
+            mainAxisSize:
+                isCompact ? MainAxisSize.max : MainAxisSize.min,
             children: [
               Text(
                 labels.keyLabel,
@@ -336,45 +381,35 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                 ),
               ),
               const SizedBox(width: 8),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    isDense: true,
-                    value: CircleOfFifthsModel.defaultKeys.any(
-                      (k) => k.major == effectiveKey,
-                    )
-                        ? effectiveKey
-                        : CircleOfFifthsModel.defaultKeys.first.major,
-                    dropdownColor: colorScheme.surfaceContainerHighest,
-                    style: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                    items: CircleOfFifthsModel.defaultKeys.map((model) {
-                      return DropdownMenuItem<String>(
-                        value: model.major,
-                        child: Text('${model.major} / ${model.minor}m (${model.keySignature})'),
-                      );
-                    }).toList(),
-                    onChanged: (newKey) {
-                      if (newKey != null) {
-                        _selectCircleKey(newKey);
-                      }
-                    },
-                  ),
-                ),
-              ),
+              if (isCompact)
+                Expanded(
+                  child: DropdownButtonHideUnderline(child: dropdownBox),
+                )
+              else
+                DropdownButtonHideUnderline(child: dropdownBox),
             ],
-          ),
-        ],
+          );
+
+          if (isCompact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                semitoneStepper,
+                const SizedBox(height: 8),
+                keySelector,
+              ],
+            );
+          }
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              semitoneStepper,
+              const SizedBox(width: 12),
+              Flexible(child: keySelector),
+            ],
+          );
+        },
       ),
     );
   }
@@ -383,39 +418,54 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.touch_app_rounded,
-            size: 16,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            widget.labels.uniqueChordsLabel,
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(width: 8),
-          for (final chord in chords)
-            Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: ActionChip(
-                visualDensity: VisualDensity.compact,
-                backgroundColor: colorScheme.secondaryContainer,
-                label: Text(
-                  chord,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSecondaryContainer,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.touch_app_rounded,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  widget.labels.uniqueChordsLabel,
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                onPressed: () => _handleChordTap(chord),
               ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final chord in chords)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ActionChip(
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: colorScheme.secondaryContainer,
+                      label: Text(
+                        chord,
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                      onPressed: () => _handleChordTap(chord),
+                    ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -479,8 +529,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
         // When showChords is false, we can render pure Text spans for pixel-perfect
         // font line-height, text selection, and exact lyricStyle.height handling.
         if (!widget.showChords) {
-          final fullLineText =
-              line.segments.map((s) => s.lyric).join();
+          final fullLineText = line.segments.map((s) => s.lyric).join();
           return Padding(
             padding: EdgeInsets.only(bottom: widget.lineSpacing),
             child: Text(
@@ -518,9 +567,8 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     required TextStyle chordStyle,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasChord = widget.showChords &&
-        segment.chord != null &&
-        segment.chord!.isNotEmpty;
+    final hasChord =
+        widget.showChords && segment.chord != null && segment.chord!.isNotEmpty;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -539,7 +587,8 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
+                        color: widget.chordBackgroundColor ??
+                            colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(

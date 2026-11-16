@@ -4,7 +4,7 @@ A comprehensive, interactive, customizable Material 3 **Circle of Fifths, Chord 
 
 [![pub package](https://img.shields.io/pub/v/flutter_circle_of_fifths.svg)](https://pub.dev/packages/flutter_circle_of_fifths)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.10.0-02569B?logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.47.0-02569B?logo=flutter)](https://flutter.dev)
 
 ---
 
@@ -68,7 +68,8 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.3.2
+  flutter_circle_of_fifths: ^2.0.0
+  material_ui: ^1.11.1
 ```
 
 Run:
@@ -77,12 +78,27 @@ Run:
 flutter pub get
 ```
 
+> **Requirements:** Flutter ≥ 3.47 (tested on 3.50) and Dart ≥ 3.13.
+
+### 🧩 Material UI package (Flutter 3.50+)
+
+Since **v2.0.0** this package is built on the standalone [`material_ui`](https://pub.dev/packages/material_ui) package, following Flutter's [official deprecation](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui) of the in-SDK Material library. Import `package:material_ui/material_ui.dart` in your app.
+
+If your app (or one of its dependencies) still imports `package:flutter/material.dart`, wrap it with `MaterialUiCompatibilityBridge` so these widgets inherit your theme and localizations:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
+  home: const HomeScreen(),
+);
+```
+
 ---
 
 ## 💻 Quick Example
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 void openCircleOfFifths(BuildContext context) {

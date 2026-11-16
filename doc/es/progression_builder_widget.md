@@ -42,7 +42,7 @@ El widget **`ProgressionBuilderWidget`** es un laboratorio interactivo para el a
 ### 1. Integración en Pantalla de Composición
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class ProgressionDemoPage extends StatelessWidget {

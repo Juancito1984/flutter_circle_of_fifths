@@ -40,7 +40,7 @@ The **`PianoKeybedWidget`** is an interactive vector piano keyboard that renders
 
 ```dart
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class PianoChordDemo extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 
 /// Vector Fretboard diagram widget for Guitar (6 strings) and Ukulele (4 strings).

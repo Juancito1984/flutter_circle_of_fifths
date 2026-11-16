@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Configuration theme for customizing the appearance and colors of [CircleOfFifthsWheelWidget].
 class CircleOfFifthsTheme {
@@ -17,6 +17,21 @@ class CircleOfFifthsTheme {
   /// Optional brand text displayed in the center of the wheel (e.g. "NyK").
   final String centerLabel;
 
+  /// Optional text color for [centerLabel]. Defaults to [ColorScheme.primary].
+  final Color? centerLabelColor;
+
+  /// Optional background color for the inactive wheel sectors.
+  /// If null, dynamically adapts to [ColorScheme.surfaceContainerLowest] (light) or [ColorScheme.surfaceContainerHigh] (dark).
+  final Color? inactiveSectorColor;
+
+  /// Optional background color for the center core/hub.
+  /// If null, dynamically adapts to [ColorScheme.surface] or [ColorScheme.surfaceContainerHigh].
+  final Color? centerHubColor;
+
+  /// Optional outline/border color for wheel arcs and circles.
+  /// If null, defaults to [ColorScheme.outlineVariant].
+  final Color? borderColor;
+
   /// Creates a [CircleOfFifthsTheme] instance for wheel color and logo customization.
   const CircleOfFifthsTheme({
     this.tonicColor,
@@ -24,5 +39,9 @@ class CircleOfFifthsTheme {
     this.minorChordsColor,
     this.diminishedColor,
     this.centerLabel = 'NyK',
+    this.centerLabelColor,
+    this.inactiveSectorColor,
+    this.centerHubColor,
+    this.borderColor,
   });
 }

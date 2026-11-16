@@ -40,7 +40,7 @@ The **`ProgressionBuilderWidget`** is an interactive laboratory for analyzing, b
 ### 1. Embedded Progression Builder
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class ProgressionPage extends StatelessWidget {

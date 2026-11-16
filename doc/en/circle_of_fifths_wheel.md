@@ -36,7 +36,7 @@ The **`CircleOfFifthsWheelWidget`** is the core visual component of the library.
 ### 1. Integration in a StatefulWidget
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class WheelDemoPage extends StatefulWidget {

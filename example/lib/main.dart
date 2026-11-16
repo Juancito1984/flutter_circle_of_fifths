@@ -1,5 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 void main() {
@@ -100,8 +100,9 @@ And [Am]grace will [G7]lead me [C]home.
   @override
   Widget build(BuildContext context) {
     final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedKeyIndex];
-    final activeKey =
-        _isMinorMode ? selectedModel.minor.toUpperCase() : selectedModel.major;
+    final activeKey = _isMinorMode
+        ? selectedModel.minor.toUpperCase()
+        : selectedModel.major;
 
     return Scaffold(
       appBar: AppBar(
@@ -222,11 +223,14 @@ And [Am]grace will [G7]lead me [C]home.
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: ChordSheetViewer(
-        showChords: false,
+        showChords: true,
         lineSpacing: 4,
         stanzaSpacing: 20,
         songText: _sampleSong,
         originalKey: 'C',
+        defaultInstrument: InstrumentType.piano,
+        showTranspositionBar: true,
+        showChordSummaryBar: true,
         targetKey: selectedModel.major,
       ),
     );
@@ -245,30 +249,26 @@ And [Am]grace will [G7]lead me [C]home.
         children: [
           Text(
             'Interactive Chord Inspector',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(context).textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
           Text(
             'Explore full fingerings for Guitar, Ukulele, and Piano:',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 16),
-          ChordInspectorSheet(
-            chordInfo: chordInfo,
-          ),
+          ChordInspectorSheet(chordInfo: chordInfo),
           const SizedBox(height: 24),
           Card(
             elevation: 0,
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
+            color: Theme.of(context).colorScheme.surfaceContainerHighest
                 .withValues(alpha: 0.5),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -279,10 +279,8 @@ And [Am]grace will [G7]lead me [C]home.
                       Expanded(
                         child: Text(
                           'Piano Interactivo con Sonido',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -297,8 +295,8 @@ And [Am]grace will [G7]lead me [C]home.
                   Text(
                     'Toca cualquier tecla del piano para escuchar su tono sintetizado:',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   PianoKeybedWidget(
@@ -323,9 +321,7 @@ And [Am]grace will [G7]lead me [C]home.
   Widget _buildProgressionBuilderScreen(String activeKey) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: ProgressionBuilderWidget(
-        activeKey: activeKey,
-      ),
+      child: ProgressionBuilderWidget(activeKey: activeKey),
     );
   }
 
@@ -333,9 +329,7 @@ And [Am]grace will [G7]lead me [C]home.
   Widget _buildScaleModesScreen(String activeKey) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: ScaleModesWidget(
-        rootNote: activeKey,
-      ),
+      child: ScaleModesWidget(rootNote: activeKey),
     );
   }
 }

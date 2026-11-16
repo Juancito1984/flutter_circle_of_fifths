@@ -54,6 +54,7 @@ And grace my fears re[D]lieved.
 | **`initialTransposeSemitones`** | `int` | `0` | Initial semitone transposition offset (`-11` to `+11`). |
 | **`targetKey`** | `String?` | `null` | External target key from the Circle of Fifths (e.g. `'G'`, `'Eb'`). Computes semitones and enharmonic spelling automatically. |
 | **`showChords`** | `bool` | `true` | Whether to display chords above lyrics. If `false`, hides chord badges, upper margins, and toolbar. |
+| **`chordBackgroundColor`** | `Color?` | `null` | Background color for chord badges above lyrics. Defaults to `Theme.of(context).colorScheme.primaryContainer`. |
 | **`showTranspositionBar`** | `bool` | `true` | Whether to show the top toolbar with semitone step buttons (`-`, `0`, `+`) and key dropdown. |
 | **`showChordSummaryBar`** | `bool` | `true` | Displays a scrollable horizontal row containing all unique chords used in the song. |
 | **`showDiagramModalOnTap`** | `bool` | `true` | If `true`, tapping any chord opens the inspector modal with Guitar, Ukulele, and Piano diagrams. |
@@ -77,7 +78,7 @@ And grace my fears re[D]lieved.
 ### 1. Basic Usage
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class SongViewerPage extends StatelessWidget {

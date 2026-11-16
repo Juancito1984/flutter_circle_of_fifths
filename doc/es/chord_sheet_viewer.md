@@ -54,6 +54,7 @@ And grace my fears re[D]lieved.
 | **`initialTransposeSemitones`** | `int` | `0` | Desplazamiento inicial de transposición en semitonos (`-11` a `+11`). |
 | **`targetKey`** | `String?` | `null` | Tonalidad objetivo externa sincronizada con el Círculo de Quintas (ej: `'G'`, `'Eb'`). Calcula automáticamente los semitonos y la enarmonía. |
 | **`showChords`** | `bool` | `true` | Determina si se muestran los acordes encima de las letras. Si es `false`, oculta los badges, los espaciados superiores y la barra de transposición. |
+| **`chordBackgroundColor`** | `Color?` | `null` | Color de fondo de los badges de acordes sobre las letras. Si es `null`, usa `Theme.of(context).colorScheme.primaryContainer`. |
 | **`showTranspositionBar`** | `bool` | `true` | Muestra u oculta la barra superior de herramientas con controles de semitonos (`-`, `0`, `+`) y selector de tonalidad. |
 | **`showChordSummaryBar`** | `bool` | `true` | Muestra una fila deslizable con los botones de todos los acordes únicos presentes en la canción. |
 | **`showDiagramModalOnTap`** | `bool` | `true` | Si es `true`, al pulsar cualquier acorde se abre el modal con las digitaciones de Guitarra, Ukelele y Piano. |
@@ -77,7 +78,7 @@ And grace my fears re[D]lieved.
 ### 1. Uso Básico
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class MySongPage extends StatelessWidget {

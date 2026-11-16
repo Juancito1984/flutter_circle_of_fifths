@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../models/scale_mode_model.dart';
@@ -24,6 +24,15 @@ class ScaleModesWidget extends StatefulWidget {
   /// Callback when a scale or mode is selected.
   final ValueChanged<ScaleFormula>? onScaleChanged;
 
+  /// Optional background color for the mode cards and detail view.
+  final Color? backgroundColor;
+
+  /// Optional primary accent color for active notes and buttons.
+  final Color? primaryColor;
+
+  /// Optional secondary color for tags and connectors.
+  final Color? secondaryColor;
+
   /// Creates a [ScaleModesWidget].
   const ScaleModesWidget({
     super.key,
@@ -32,6 +41,9 @@ class ScaleModesWidget extends StatefulWidget {
     this.showPianoKeyboard = true,
     this.labels = const CircleOfFifthsLabels(),
     this.onScaleChanged,
+    this.backgroundColor,
+    this.primaryColor,
+    this.secondaryColor,
   });
 
   @override
@@ -77,9 +89,11 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
 
     final notes = _selectedScale.getNotes(_root);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         // Top Toolbar: Category Selector & Root Picker
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -168,7 +182,10 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
+            color: widget.backgroundColor ??
+                (Theme.of(context).brightness == Brightness.dark
+                    ? colorScheme.surfaceContainerHigh
+                    : colorScheme.surfaceContainerLowest),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -184,7 +201,7 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
                     '$_root ${_selectedScale.name}',
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
+                      color: widget.primaryColor ?? colorScheme.primary,
                     ),
                   ),
                   Text(
@@ -298,9 +315,14 @@ class _ScaleModesWidgetState extends State<ScaleModesWidget> {
             octaves: 2,
             height: 130,
             preferFlats: ChordTransposer.prefersFlatsForKey(_root),
+            rootKeyColor: widget.primaryColor,
+            activeKeyColor: widget.secondaryColor ??
+                widget.primaryColor?.withValues(alpha: 0.25),
+            activeBlackKeyColor: widget.secondaryColor,
           ),
         ],
       ],
-    );
+    ),
+  );
   }
 }

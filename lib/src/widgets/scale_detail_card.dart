@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
@@ -22,6 +22,22 @@ class ScaleDetailCard extends StatelessWidget {
   /// Custom localization labels.
   final CircleOfFifthsLabels labels;
 
+  /// Optional background color for the card container.
+  /// Defaults to [ColorScheme.surfaceContainerHigh] (or [ColorScheme.surfaceContainerLow] / surface).
+  final Color? backgroundColor;
+
+  /// Optional accent color for the scale title, active notes, and tonic highlights.
+  /// Defaults to [ColorScheme.primary].
+  final Color? primaryColor;
+
+  /// Optional secondary color for interval formula labels and connectors.
+  /// Defaults to [ColorScheme.secondary].
+  final Color? secondaryColor;
+
+  /// Optional border color for the card outline.
+  /// Defaults to [ColorScheme.outlineVariant].
+  final Color? borderColor;
+
   /// Creates a [ScaleDetailCard] widget displaying scale notes and interval formula.
   const ScaleDetailCard({
     super.key,
@@ -30,6 +46,10 @@ class ScaleDetailCard extends StatelessWidget {
     this.showPianoScale = false,
     this.enableChordTap = true,
     this.labels = const CircleOfFifthsLabels(),
+    this.backgroundColor,
+    this.primaryColor,
+    this.secondaryColor,
+    this.borderColor,
   });
 
   String _formatDegreeNote(String note, int index) {
@@ -100,6 +120,15 @@ class ScaleDetailCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final effectivePrimaryColor = primaryColor ?? colorScheme.primary;
+    final effectiveSecondaryColor = secondaryColor ?? colorScheme.secondary;
+    final effectiveBgColor = backgroundColor ??
+        (Theme.of(context).brightness == Brightness.dark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surfaceContainerLowest);
+    final effectiveBorderColor =
+        borderColor ?? colorScheme.outlineVariant.withValues(alpha: 0.5);
+
     final intervals = isMinorMode
         ? const ['2', '1', '2', '2', '1', '2', '2']
         : const ['2', '2', '1', '2', '2', '2', '1'];
@@ -109,127 +138,137 @@ class ScaleDetailCard extends StatelessWidget {
         ? '${model.minor.toUpperCase()}m ${labels.minorLabel} ${model.major})'
         : '${model.major} ${labels.majorLabel}';
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: effectiveBgColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: effectiveBorderColor,
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  scaleTitle,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              if (enableChordTap)
-                Text(
-                  labels.tapDegreeForChordHint,
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Scale notes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(notes.length, (index) {
-              final rawNote = notes[index];
-              final formattedNote = _formatDegreeNote(rawNote, index);
-              final chordSymbol = _chordSymbolForDegree(rawNote, index);
-
-              return InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: enableChordTap
-                    ? () => ChordInspectorSheet.show(
-                          context,
-                          chordSymbol: chordSymbol,
-                          labels: labels,
-                        )
-                    : null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 2,
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        formattedNote,
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      CircleAvatar(
-                        radius: 10,
-                        backgroundColor: colorScheme.primaryContainer,
-                        child: Text(
-                          '${index + 1}',
-                          style: textTheme.labelSmall?.copyWith(
-                            fontSize: 10,
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 12),
-
-          // Interval connectors
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(intervals.length, (index) {
-              return Row(
-                children: [
-                  Icon(
-                    Icons.arrow_right_alt_rounded,
-                    size: 14,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  Text(
-                    intervals[index],
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.secondary,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    scaleTitle,
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                ],
-              );
-            }),
-          ),
-
-          if (showPianoScale) ...[
-            const SizedBox(height: 16),
-            PianoKeybedWidget(
-              highlightedNotes: notes.sublist(0, 7),
-              rootNote: notes.first,
-              octaves: 2,
-              height: 120,
-              preferFlats: model.keySignature.contains('b'),
+                ),
+                if (enableChordTap)
+                  Text(
+                    labels.tapDegreeForChordHint,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
             ),
+            const SizedBox(height: 16),
+
+            // Scale notes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(notes.length, (index) {
+                final rawNote = notes[index];
+                final formattedNote = _formatDegreeNote(rawNote, index);
+                final chordSymbol = _chordSymbolForDegree(rawNote, index);
+
+                return InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: enableChordTap
+                      ? () => ChordInspectorSheet.show(
+                            context,
+                            chordSymbol: chordSymbol,
+                            labels: labels,
+                          )
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          formattedNote,
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: effectivePrimaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        CircleAvatar(
+                          radius: 10,
+                          backgroundColor: primaryColor != null
+                              ? primaryColor!.withValues(alpha: 0.15)
+                              : colorScheme.primaryContainer,
+                          child: Text(
+                            '${index + 1}',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontSize: 10,
+                              color: primaryColor ??
+                                  colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 12),
+
+            // Interval connectors
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(intervals.length, (index) {
+                return Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_right_alt_rounded,
+                      size: 14,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    Text(
+                      intervals[index],
+                      style: textTheme.labelSmall?.copyWith(
+                        color: effectiveSecondaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
+
+            if (showPianoScale) ...[
+              const SizedBox(height: 16),
+              PianoKeybedWidget(
+                highlightedNotes: notes.sublist(0, 7),
+                rootNote: notes.first,
+                octaves: 2,
+                height: 120,
+                preferFlats: model.keySignature.contains('b'),
+                rootKeyColor: primaryColor,
+                activeKeyColor: secondaryColor ??
+                    primaryColor?.withValues(alpha: 0.25),
+                activeBlackKeyColor: secondaryColor,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

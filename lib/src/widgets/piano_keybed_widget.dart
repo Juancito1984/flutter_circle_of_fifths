@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 
 /// Interactive vector Piano Keybed widget (1 or 2 octaves) that highlights
@@ -25,6 +25,18 @@ class PianoKeybedWidget extends StatelessWidget {
   /// Prefer flat notation (`Db`, `Eb`, `Gb`, `Ab`, `Bb`) on key labels.
   final bool preferFlats;
 
+  /// Optional custom background color for active/highlighted white keys.
+  /// Defaults to [ColorScheme.primaryContainer].
+  final Color? activeKeyColor;
+
+  /// Optional custom accent color for the root/tonic key.
+  /// Defaults to [ColorScheme.primary].
+  final Color? rootKeyColor;
+
+  /// Optional custom background color for active/highlighted black keys.
+  /// Defaults to [ColorScheme.secondary].
+  final Color? activeBlackKeyColor;
+
   /// Creates a [PianoKeybedWidget].
   const PianoKeybedWidget({
     super.key,
@@ -35,6 +47,9 @@ class PianoKeybedWidget extends StatelessWidget {
     this.onNoteTap,
     this.height = 150,
     this.preferFlats = false,
+    this.activeKeyColor,
+    this.rootKeyColor,
+    this.activeBlackKeyColor,
   }) : assert(octaves >= 1 && octaves <= 3, 'octaves must be between 1 and 3');
 
   List<int> _computeActiveKeys() {
@@ -102,6 +117,9 @@ class PianoKeybedWidget extends StatelessWidget {
                 showNoteLabels: showNoteLabels,
                 preferFlats: preferFlats,
                 colorScheme: colorScheme,
+                customActiveKeyColor: activeKeyColor,
+                customRootKeyColor: rootKeyColor,
+                customActiveBlackKeyColor: activeBlackKeyColor,
               ),
             ),
           );
@@ -168,6 +186,9 @@ class _PianoKeybedPainter extends CustomPainter {
   final bool showNoteLabels;
   final bool preferFlats;
   final ColorScheme colorScheme;
+  final Color? customActiveKeyColor;
+  final Color? customRootKeyColor;
+  final Color? customActiveBlackKeyColor;
 
   _PianoKeybedPainter({
     required this.activeKeys,
@@ -176,6 +197,9 @@ class _PianoKeybedPainter extends CustomPainter {
     required this.showNoteLabels,
     required this.preferFlats,
     required this.colorScheme,
+    this.customActiveKeyColor,
+    this.customRootKeyColor,
+    this.customActiveBlackKeyColor,
   });
 
   static const List<int> _whiteSemitones = [0, 2, 4, 5, 7, 9, 11];
@@ -220,10 +244,14 @@ class _PianoKeybedPainter extends CustomPainter {
         bottomRight: const Radius.circular(6),
       );
 
+      final effectiveRootColor = customRootKeyColor ?? colorScheme.primary;
+      final effectiveActiveWhiteColor =
+          customActiveKeyColor ?? colorScheme.primaryContainer;
+
       if (isRoot) {
-        fillPaint.color = colorScheme.primary;
+        fillPaint.color = effectiveRootColor;
       } else if (isHighlighted) {
-        fillPaint.color = colorScheme.primaryContainer;
+        fillPaint.color = effectiveActiveWhiteColor;
       } else {
         fillPaint.color = Colors.white;
       }
@@ -239,7 +267,11 @@ class _PianoKeybedPainter extends CustomPainter {
         final textColor = isRoot
             ? colorScheme.onPrimary
             : isHighlighted
-                ? colorScheme.onPrimaryContainer
+                ? (customActiveKeyColor != null
+                    ? (ThemeData.estimateBrightnessForColor(effectiveActiveWhiteColor) == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87)
+                    : colorScheme.onPrimaryContainer)
                 : Colors.black54;
 
         _drawCenteredText(
@@ -279,16 +311,46 @@ class _PianoKeybedPainter extends CustomPainter {
           bottomRight: const Radius.circular(5),
         );
 
+        final effectiveRootColor = customRootKeyColor ?? colorScheme.primary;
+        final effectiveActiveBlackColor =
+            customActiveBlackKeyColor ?? colorScheme.secondary;
+
+        final blackKeyBorderPaint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = isHighlighted ? 1.8 : 1.2
+          ..color = isHighlighted
+              ? (isRoot ? effectiveRootColor : effectiveActiveBlackColor)
+              : colorScheme.outlineVariant;
+
         if (isRoot) {
-          fillPaint.color = colorScheme.primary;
+          fillPaint.color = effectiveRootColor;
         } else if (isHighlighted) {
-          fillPaint.color = colorScheme.tertiary;
+          fillPaint.color = effectiveActiveBlackColor;
         } else {
           fillPaint.color = const Color(0xFF1E1E24);
         }
 
         canvas.drawRRect(rect, fillPaint);
-        canvas.drawRRect(rect, borderPaint);
+        canvas.drawRRect(rect, blackKeyBorderPaint);
+
+        // Highlight indicator badge at the bottom of the black key
+        if (isHighlighted) {
+          final indicatorPaint = Paint()
+            ..style = PaintingStyle.fill
+            ..color = isRoot ? colorScheme.onPrimary : colorScheme.onSecondary;
+
+          final indicatorWidth = blackKeyWidth * 0.45;
+          const indicatorHeight = 3.5;
+          final indicatorRect = RRect.fromRectAndRadius(
+            Rect.fromCenter(
+              center: Offset(centerX, blackKeyHeight - 4.5),
+              width: indicatorWidth,
+              height: indicatorHeight,
+            ),
+            const Radius.circular(2),
+          );
+          canvas.drawRRect(indicatorRect, indicatorPaint);
+        }
 
         if (showNoteLabels && isHighlighted) {
           final label = ChordTransposer.semitoneToNote(
@@ -297,12 +359,12 @@ class _PianoKeybedPainter extends CustomPainter {
           );
           final textColor = isRoot
               ? colorScheme.onPrimary
-              : colorScheme.onTertiary;
+              : colorScheme.onSecondary;
 
           _drawCenteredText(
             canvas,
             label,
-            Offset(centerX, blackKeyHeight - 14),
+            Offset(centerX, blackKeyHeight - 16),
             TextStyle(
               color: textColor,
               fontWeight: FontWeight.bold,

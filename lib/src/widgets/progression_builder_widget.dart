@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../models/harmonic_progression_model.dart';
@@ -25,6 +25,12 @@ class ProgressionBuilderWidget extends StatefulWidget {
   /// Optional callback when a chord in the progression is tapped.
   final ValueChanged<String>? onChordTap;
 
+  /// Optional background color for the progression container.
+  final Color? backgroundColor;
+
+  /// Optional primary accent color for active chord badges and buttons.
+  final Color? primaryColor;
+
   /// Creates a [ProgressionBuilderWidget].
   const ProgressionBuilderWidget({
     super.key,
@@ -32,6 +38,8 @@ class ProgressionBuilderWidget extends StatefulWidget {
     this.showKeySelector = true,
     this.labels = const CircleOfFifthsLabels(),
     this.onChordTap,
+    this.backgroundColor,
+    this.primaryColor,
   });
 
   @override
@@ -87,9 +95,11 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
     final labels = widget.labels;
     final passingChords = HarmonicProgression.getPassingChordSuggestions(_key);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         // Header & Key Picker
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -173,7 +183,11 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            color: widget.backgroundColor != null
+                ? widget.backgroundColor!.withValues(alpha: 0.5)
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                    : colorScheme.surfaceContainerLowest),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -198,6 +212,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
               preferFlats: ChordTransposer.prefersFlatsForKey(_key),
             );
             final chordSymbol = '$chordRoot${step.quality}';
+            final effectivePrimary = widget.primaryColor ?? colorScheme.primary;
 
             return InkWell(
               borderRadius: BorderRadius.circular(16),
@@ -213,10 +228,13 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
                 width: 90,
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHigh,
+                  color: widget.backgroundColor ??
+                      (Theme.of(context).brightness == Brightness.dark
+                          ? colorScheme.surfaceContainerHigh
+                          : colorScheme.surfaceContainerLowest),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: colorScheme.primary.withValues(alpha: 0.6),
+                    color: effectivePrimary.withValues(alpha: 0.6),
                     width: 1.5,
                   ),
                 ),
@@ -329,6 +347,7 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
           }).toList(),
         ),
       ],
-    );
+    ),
+  );
   }
 }

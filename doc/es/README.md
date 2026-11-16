@@ -4,7 +4,7 @@ Una suite musical completa, interactiva, personalizable y adaptada a **Material 
 
 [![pub package](https://img.shields.io/pub/v/flutter_circle_of_fifths.svg)](https://pub.dev/packages/flutter_circle_of_fifths)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.10.0-02569B?logo=flutter)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.47.0-02569B?logo=flutter)](https://flutter.dev)
 
 *🌍 [Switch to English Documentation](../en/README.md) | [🏠 Portada Principal](../../README.md)*
 
@@ -50,13 +50,35 @@ Agrega la dependencia en tu archivo `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^1.3.2
+  flutter_circle_of_fifths: ^2.0.0
+  material_ui: ^1.11.1
 ```
 
 Ejecuta en la terminal:
 
 ```bash
 flutter pub get
+```
+
+> **Requisitos:** Flutter ≥ 3.47 (probado en 3.50) y Dart ≥ 3.13.
+
+### 🧩 Paquete Material UI (Flutter 3.50+)
+
+Desde la **v2.0.0** este paquete usa el paquete independiente [`material_ui`](https://pub.dev/packages/material_ui), siguiendo la [deprecación oficial](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui) de la librería Material integrada en el SDK de Flutter. Todos los ejemplos de esta documentación importan `package:material_ui/material_ui.dart`.
+
+Si tu app (o alguna de sus dependencias) todavía importa `package:flutter/material.dart`, envuélvela con `MaterialUiCompatibilityBridge` para que estos widgets hereden tu tema y localizaciones:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
+  home: const HomeScreen(),
+);
+```
+
+Para migrar tu propio código automáticamente, ejecuta:
+
+```bash
+dart fix --apply --code=migrate_design_widgets
 ```
 
 ---
@@ -66,7 +88,7 @@ flutter pub get
 ### 1. Desplegar el Círculo de Quintas como Modal (Una línea)
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 void abrirCirculoDeQuintas(BuildContext context) {
@@ -82,7 +104,7 @@ void abrirCirculoDeQuintas(BuildContext context) {
 ### 2. Visor de Canciones con Acordes y Transposición
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 const cancionTexto = '''
@@ -112,7 +134,7 @@ Widget visorDeCancion() {
 Configura o traduce todos los textos de la interfaz desde un único lugar con `CircleOfFifthsLabels`:
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 // Usar la traducción al español integrada directamente

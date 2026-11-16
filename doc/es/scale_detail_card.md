@@ -28,6 +28,10 @@ El widget **`ScaleDetailCard`** es una tarjeta informativa completa y modular qu
 | **`showPianoScale`** | `bool` | `false` | Renderiza un teclado visual interactivo de piano resaltando las notas de la escala. |
 | **`enableChordTap`** | `bool` | `true` | Habilita pulsar los grados para inspeccionar sus diagramas de digitaciones en instrumentos. |
 | **`labels`** | `CircleOfFifthsLabels` | `CircleOfFifthsLabels()` | Textos y traducciones para encabezados (ej: `labels.scaleFormula`, `labels.degreeNumbers`). |
+| **`backgroundColor`** | `Color?` | `null` | Color de fondo de la tarjeta. Por defecto se adapta dinámicamente según el brillo del tema (`surfaceContainerLowest` en claro, `surfaceContainerHigh` en oscuro). |
+| **`primaryColor`** | `Color?` | `null` | Color de acento primario para el título, nombres de notas y tónica. Por defecto usa `colorScheme.primary`. |
+| **`secondaryColor`** | `Color?` | `null` | Color secundario para los intervalos y conectores. Por defecto usa `colorScheme.secondary`. |
+| **`borderColor`** | `Color?` | `null` | Color del borde de la tarjeta. Por defecto usa `colorScheme.outlineVariant` con opacidad suave. |
 
 ---
 
@@ -36,7 +40,7 @@ El widget **`ScaleDetailCard`** es una tarjeta informativa completa y modular qu
 ### 1. Uso Estándar en Pantalla
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class ScalePage extends StatelessWidget {

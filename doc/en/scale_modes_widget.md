@@ -42,7 +42,7 @@ The **`ScaleModesWidget`** is an interactive theoretical explorer for the **7 Gr
 ### 1. Modes Explorer Screen
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_circle_of_fifths/flutter_circle_of_fifths.dart';
 
 class ModesPage extends StatelessWidget {

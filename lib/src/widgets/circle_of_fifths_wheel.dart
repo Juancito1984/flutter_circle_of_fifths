@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_theme.dart';
 
@@ -116,21 +116,29 @@ class _CircleOfFifthsPainter extends CustomPainter {
 
     final paint = Paint()..style = PaintingStyle.fill;
 
+    final effectiveBorderColor = customTheme.borderColor ??
+        colorScheme.outlineVariant.withValues(alpha: isDark ? 0.6 : 0.4);
+
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5
-      ..color = colorScheme.outlineVariant.withValues(alpha: 0.6);
+      ..color = effectiveBorderColor;
 
-    // Color palette with fallback to Theme defaults
-    final Color tonicaColor = customTheme.tonicColor ??
-        (isDark ? const Color(0xFFFFB74D) : const Color(0xFFF57C00));
+    // Harmonious theme adaptation:
+    // If customTheme colors are provided, use them. Otherwise, adapt intelligently to Theme.of(context).colorScheme!
+    final Color tonicaColor = customTheme.tonicColor ?? colorScheme.primary;
     final Color gradosCuartoQuintoColor =
-        customTheme.subdominantDominantColor ??
-            (isDark ? const Color(0xFFE57373) : const Color(0xFFC62828));
+        customTheme.subdominantDominantColor ?? colorScheme.secondary;
     final Color acordesMenoresColor = customTheme.minorChordsColor ??
         (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32));
     final Color disminuidoColor = customTheme.diminishedColor ??
         (isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0));
+
+    // Dynamic background for inactive sectors adapting cleanly to light/dark themes
+    final Color defaultInactiveSectorColor = customTheme.inactiveSectorColor ??
+        (isDark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surfaceContainerLowest);
 
     // Draw the 12 sectors rotated so selectedIndex is at 12:00
     for (int visIndex = 0; visIndex < 12; visIndex++) {
@@ -139,8 +147,8 @@ class _CircleOfFifthsPainter extends CustomPainter {
 
       final startAngle = rotationOffset + (visIndex * sectorAngle);
 
-      Color outerSectorColor = colorScheme.surfaceContainerHigh;
-      Color innerSectorColor = colorScheme.surfaceContainerHigh;
+      Color outerSectorColor = defaultInactiveSectorColor;
+      Color innerSectorColor = defaultInactiveSectorColor;
       Color textColorOnOuter = colorScheme.onSurface;
       Color textColorOnInner = colorScheme.onSurface;
 
@@ -148,17 +156,29 @@ class _CircleOfFifthsPainter extends CustomPainter {
         // MAJOR MODE
         if (visIndex == 0) {
           outerSectorColor = tonicaColor;
-          textColorOnOuter = isDark ? Colors.black : Colors.white;
+          textColorOnOuter =
+              ThemeData.estimateBrightnessForColor(tonicaColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 11) {
           outerSectorColor = gradosCuartoQuintoColor;
-          textColorOnOuter = Colors.white;
+          textColorOnOuter =
+              ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 1) {
           outerSectorColor = gradosCuartoQuintoColor;
-          textColorOnOuter = Colors.white;
+          textColorOnOuter =
+              ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 2) {
@@ -169,17 +189,29 @@ class _CircleOfFifthsPainter extends CustomPainter {
         // MINOR MODE
         if (visIndex == 0) {
           innerSectorColor = tonicaColor;
-          textColorOnInner = isDark ? Colors.black : Colors.white;
+          textColorOnInner =
+              ThemeData.estimateBrightnessForColor(tonicaColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 11) {
           innerSectorColor = gradosCuartoQuintoColor;
-          textColorOnInner = Colors.white;
+          textColorOnInner =
+              ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 1) {
           innerSectorColor = gradosCuartoQuintoColor;
-          textColorOnInner = Colors.white;
+          textColorOnInner =
+              ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 2) {
@@ -292,7 +324,11 @@ class _CircleOfFifthsPainter extends CustomPainter {
 
     // --- CENTER CORE WITH BRAND ---
     final coreRadius = radius * 0.25;
-    paint.color = colorScheme.surfaceContainerHigh;
+    final effectiveHubColor = customTheme.centerHubColor ??
+        (isDark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surfaceContainerLowest);
+    paint.color = effectiveHubColor;
     canvas.drawCircle(center, coreRadius, paint);
     canvas.drawCircle(center, coreRadius, borderPaint);
 
@@ -302,7 +338,7 @@ class _CircleOfFifthsPainter extends CustomPainter {
         customTheme.centerLabel,
         center,
         TextStyle(
-          color: colorScheme.primary,
+          color: customTheme.centerLabelColor ?? colorScheme.primary,
           fontWeight: FontWeight.bold,
           fontSize: 18,
           letterSpacing: 1.5,
