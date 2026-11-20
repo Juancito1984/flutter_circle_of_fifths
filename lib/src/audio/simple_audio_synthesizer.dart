@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
+
 import '../models/chord_model.dart';
 
 /// Pure Dart audio synthesizer generating in-memory PCM WAV audio.
@@ -52,7 +54,11 @@ class SimpleAudioSynthesizer {
     bdata.setUint16(20, 1, Endian.little); // AudioFormat (1 for PCM)
     bdata.setUint16(22, 1, Endian.little); // NumChannels (1 = Mono)
     bdata.setUint32(24, sampleRate, Endian.little); // SampleRate
-    bdata.setUint32(28, sampleRate * 2, Endian.little); // ByteRate (SampleRate * 1 * 2)
+    bdata.setUint32(
+      28,
+      sampleRate * 2,
+      Endian.little,
+    ); // ByteRate (SampleRate * 1 * 2)
     bdata.setUint16(32, 2, Endian.little); // BlockAlign (1 * 2)
     bdata.setUint16(34, 16, Endian.little); // BitsPerSample
     // "data"
@@ -75,12 +81,15 @@ class SimpleAudioSynthesizer {
       double sampleSum = 0.0;
       for (final freq in frequencies) {
         // Fundamental sine wave + subtle 2nd harmonic for warmer timbre
-        final wave = 0.85 * math.sin(2.0 * math.pi * freq * t) +
+        final wave =
+            0.85 * math.sin(2.0 * math.pi * freq * t) +
             0.15 * math.sin(4.0 * math.pi * freq * t);
         sampleSum += wave * gainPerFreq;
       }
 
-      final sampleValue = (sampleSum * envelope * 32767.0).clamp(-32768.0, 32767.0).toInt();
+      final sampleValue = (sampleSum * envelope * 32767.0)
+          .clamp(-32768.0, 32767.0)
+          .toInt();
       bdata.setInt16(44 + i * 2, sampleValue, Endian.little);
     }
 

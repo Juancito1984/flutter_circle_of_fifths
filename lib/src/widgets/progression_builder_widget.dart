@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../models/harmonic_progression_model.dart';
@@ -100,254 +101,264 @@ class _ProgressionBuilderWidgetState extends State<ProgressionBuilderWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        // Header & Key Picker
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  labels.progressionTitle,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                Text(
-                  labels.progressionSubtitle,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            if (widget.showKeySelector)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    isDense: true,
-                    value: _key,
-                    style: textTheme.titleSmall?.copyWith(
+          // Header & Key Picker
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    labels.progressionTitle,
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimaryContainer,
+                      color: colorScheme.onSurface,
                     ),
-                    items: CircleOfFifthsModel.defaultKeys.map((k) {
-                      return DropdownMenuItem<String>(
-                        value: k.major,
-                        child: Text('${k.major} ${labels.majorLabel}'),
-                      );
-                    }).toList(),
-                    onChanged: (newKey) {
-                      if (newKey != null) {
-                        setState(() {
-                          _key = newKey;
-                        });
-                      }
+                  ),
+                  Text(
+                    labels.progressionSubtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              if (widget.showKeySelector)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isDense: true,
+                      value: _key,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                      items: CircleOfFifthsModel.defaultKeys.map((k) {
+                        return DropdownMenuItem<String>(
+                          value: k.major,
+                          child: Text('${k.major} ${labels.majorLabel}'),
+                        );
+                      }).toList(),
+                      onChanged: (newKey) {
+                        if (newKey != null) {
+                          setState(() {
+                            _key = newKey;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Template Selector Pills
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: HarmonicProgression.standardTemplates.map((template) {
+                final isSelected = template.name == _selectedProgression.name;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(template.name.split('(').first.trim()),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) _selectTemplate(template);
                     },
                   ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 12),
 
-        // Template Selector Pills
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: HarmonicProgression.standardTemplates.map((template) {
-              final isSelected = template.name == _selectedProgression.name;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  label: Text(template.name.split('(').first.trim()),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) _selectTemplate(template);
-                  },
+          // Description Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.backgroundColor != null
+                  ? widget.backgroundColor!.withValues(alpha: 0.5)
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.5,
+                          )
+                        : colorScheme.surfaceContainerLowest),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              _selectedProgression.description,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Active Progression Cards (Roman Numeral + Chord Symbol)
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(_customSteps.length, (index) {
+              final step = _customSteps[index];
+              final rootIndex = ChordTransposer.noteToSemitone(_key);
+              final chordRoot = ChordTransposer.semitoneToNote(
+                rootIndex + step.semitoneOffset,
+                preferFlats: ChordTransposer.prefersFlatsForKey(_key),
+              );
+              final chordSymbol = '$chordRoot${step.quality}';
+              final effectivePrimary =
+                  widget.primaryColor ?? colorScheme.primary;
+
+              return InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  widget.onChordTap?.call(chordSymbol);
+                  ChordInspectorSheet.show(
+                    context,
+                    chordSymbol: chordSymbol,
+                    labels: widget.labels,
+                  );
+                },
+                child: Container(
+                  width: 90,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        widget.backgroundColor ??
+                        (Theme.of(context).brightness == Brightness.dark
+                            ? colorScheme.surfaceContainerHigh
+                            : colorScheme.surfaceContainerLowest),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: effectivePrimary.withValues(alpha: 0.6),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Step index / Delete button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CircleAvatar(
+                            radius: 9,
+                            backgroundColor: colorScheme.primaryContainer,
+                            child: Text(
+                              '${index + 1}',
+                              style: textTheme.labelSmall?.copyWith(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          if (_customSteps.length > 2)
+                            InkWell(
+                              onTap: () => _removeStepAt(index),
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Roman Numeral
+                      Text(
+                        step.romanNumeral,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: colorScheme.primary,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Concrete Chord
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          chordSymbol,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Function Label
+                      Text(
+                        step.functionName.split(' ').first,
+                        style: textTheme.labelSmall?.copyWith(
+                          fontSize: 9,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
+              );
+            }),
+          ),
+          const SizedBox(height: 20),
+
+          // Passing Chords & Modulations Suggestion Section
+          Text(
+            labels.passingChordsSectionLabel,
+            style: textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: passingChords.map((step) {
+              final rootIndex = ChordTransposer.noteToSemitone(_key);
+              final chordRoot = ChordTransposer.semitoneToNote(
+                rootIndex + step.semitoneOffset,
+                preferFlats: ChordTransposer.prefersFlatsForKey(_key),
+              );
+              final chordSymbol = '$chordRoot${step.quality}';
+
+              return ActionChip(
+                avatar: const Icon(Icons.add_rounded, size: 16),
+                label: Text('${step.romanNumeral} ($chordSymbol)'),
+                tooltip: step.functionName,
+                onPressed: () => _addSuggestedStep(step),
               );
             }).toList(),
           ),
-        ),
-        const SizedBox(height: 12),
-
-        // Description Card
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: widget.backgroundColor != null
-                ? widget.backgroundColor!.withValues(alpha: 0.5)
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                    : colorScheme.surfaceContainerLowest),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            _selectedProgression.description,
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Active Progression Cards (Roman Numeral + Chord Symbol)
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: List.generate(_customSteps.length, (index) {
-            final step = _customSteps[index];
-            final rootIndex = ChordTransposer.noteToSemitone(_key);
-            final chordRoot = ChordTransposer.semitoneToNote(
-              rootIndex + step.semitoneOffset,
-              preferFlats: ChordTransposer.prefersFlatsForKey(_key),
-            );
-            final chordSymbol = '$chordRoot${step.quality}';
-            final effectivePrimary = widget.primaryColor ?? colorScheme.primary;
-
-            return InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                widget.onChordTap?.call(chordSymbol);
-                ChordInspectorSheet.show(
-                  context,
-                  chordSymbol: chordSymbol,
-                  labels: widget.labels,
-                );
-              },
-              child: Container(
-                width: 90,
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor ??
-                      (Theme.of(context).brightness == Brightness.dark
-                          ? colorScheme.surfaceContainerHigh
-                          : colorScheme.surfaceContainerLowest),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: effectivePrimary.withValues(alpha: 0.6),
-                    width: 1.5,
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Step index / Delete button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CircleAvatar(
-                          radius: 9,
-                          backgroundColor: colorScheme.primaryContainer,
-                          child: Text(
-                            '${index + 1}',
-                            style: textTheme.labelSmall?.copyWith(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        if (_customSteps.length > 2)
-                          InkWell(
-                            onTap: () => _removeStepAt(index),
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 14,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Roman Numeral
-                    Text(
-                      step.romanNumeral,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: colorScheme.primary,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Concrete Chord
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        chordSymbol,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSecondaryContainer,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-
-                    // Function Label
-                    Text(
-                      step.functionName.split(' ').first,
-                      style: textTheme.labelSmall?.copyWith(
-                        fontSize: 9,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ),
-        const SizedBox(height: 20),
-
-        // Passing Chords & Modulations Suggestion Section
-        Text(
-          labels.passingChordsSectionLabel,
-          style: textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: passingChords.map((step) {
-            final rootIndex = ChordTransposer.noteToSemitone(_key);
-            final chordRoot = ChordTransposer.semitoneToNote(
-              rootIndex + step.semitoneOffset,
-              preferFlats: ChordTransposer.prefersFlatsForKey(_key),
-            );
-            final chordSymbol = '$chordRoot${step.quality}';
-
-            return ActionChip(
-              avatar: const Icon(Icons.add_rounded, size: 16),
-              label: Text('${step.romanNumeral} ($chordSymbol)'),
-              tooltip: step.functionName,
-              onPressed: () => _addSuggestedStep(step),
-            );
-          }).toList(),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
   }
 }

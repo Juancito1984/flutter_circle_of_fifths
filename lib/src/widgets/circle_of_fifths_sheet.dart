@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import '../theme/circle_of_fifths_theme.dart';
@@ -80,7 +81,8 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
     final selectedModel = CircleOfFifthsModel.defaultKeys[_selectedIndex];
 
     final sheetTitle = widget._overrideTitle ?? widget.labels.title;
-    final wheelLabel = widget._overrideInteractiveWheelLabel ??
+    final wheelLabel =
+        widget._overrideInteractiveWheelLabel ??
         widget.labels.interactiveWheelLabel;
     final summaryLabel =
         widget._overrideSummaryViewLabel ?? widget.labels.summaryViewLabel;
@@ -95,184 +97,188 @@ class _CircleOfFifthsSheetState extends State<CircleOfFifthsSheet> {
           type: MaterialType.transparency,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Header
-              Row(
-                children: [
-                  Icon(
-                    Icons.adjust_rounded,
-                    color: colorScheme.primary,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    sheetTitle,
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+            child: ListView(
+              controller: scrollController,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.4,
+                      ),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 16),
 
-              // View Selector (SegmentedButton)
-              SegmentedButton<int>(
-                segments: [
-                  ButtonSegment(
-                    value: 0,
-                    label: Text(wheelLabel),
-                    icon: const Icon(Icons.incomplete_circle_rounded),
-                  ),
-                  ButtonSegment(
-                    value: 1,
-                    label: Text(summaryLabel),
-                    icon: const Icon(Icons.grid_view_rounded),
-                  ),
-                ],
-                selected: {_selectedView},
-                onSelectionChanged: (newSelection) {
-                  setState(() {
-                    _selectedView = newSelection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
+                // Header
+                Row(
+                  children: [
+                    Icon(
+                      Icons.adjust_rounded,
+                      color: colorScheme.primary,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      sheetTitle,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
 
-              // VIEW 1: INTERACTIVE WHEEL
-              if (_selectedView == 0) ...[
-                CircleOfFifthsWheelWidget(
-                  selectedIndex: _selectedIndex,
-                  isMinorMode: _isMinorMode,
-                  customTheme: widget.customTheme,
-                  onKeySelected: (index, isMinor) {
+                // View Selector (SegmentedButton)
+                SegmentedButton<int>(
+                  segments: [
+                    ButtonSegment(
+                      value: 0,
+                      label: Text(wheelLabel),
+                      icon: const Icon(Icons.incomplete_circle_rounded),
+                    ),
+                    ButtonSegment(
+                      value: 1,
+                      label: Text(summaryLabel),
+                      icon: const Icon(Icons.grid_view_rounded),
+                    ),
+                  ],
+                  selected: {_selectedView},
+                  onSelectionChanged: (newSelection) {
                     setState(() {
-                      _selectedIndex = index;
-                      _isMinorMode = isMinor;
+                      _selectedView = newSelection.first;
                     });
-                    final m = CircleOfFifthsModel.defaultKeys[index];
-                    final keyName = isMinor ? '${m.minor}m' : m.major;
-                    widget.onKeySelected?.call(keyName);
                   },
                 ),
                 const SizedBox(height: 20),
-                ScaleDetailCard(
-                  model: selectedModel,
-                  isMinorMode: _isMinorMode,
-                  labels: widget.labels,
-                ),
-              ]
 
-              // VIEW 2: SUMMARY GRID
-              else ...[
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: CircleOfFifthsModel.defaultKeys.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.8,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                // VIEW 1: INTERACTIVE WHEEL
+                if (_selectedView == 0) ...[
+                  CircleOfFifthsWheelWidget(
+                    selectedIndex: _selectedIndex,
+                    isMinorMode: _isMinorMode,
+                    customTheme: widget.customTheme,
+                    onKeySelected: (index, isMinor) {
+                      setState(() {
+                        _selectedIndex = index;
+                        _isMinorMode = isMinor;
+                      });
+                      final m = CircleOfFifthsModel.defaultKeys[index];
+                      final keyName = isMinor ? '${m.minor}m' : m.major;
+                      widget.onKeySelected?.call(keyName);
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    final item = CircleOfFifthsModel.defaultKeys[index];
-                    final isSelected = index == _selectedIndex;
-
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = index;
-                          _isMinorMode = false;
-                          _selectedView = 0;
-                        });
-                        widget.onKeySelected?.call(item.major);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? colorScheme.primaryContainer
-                              : colorScheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isSelected
-                                ? colorScheme.primary
-                                : colorScheme.outlineVariant
-                                    .withValues(alpha: 0.5),
-                          ),
+                  const SizedBox(height: 20),
+                  ScaleDetailCard(
+                    model: selectedModel,
+                    isMinorMode: _isMinorMode,
+                    labels: widget.labels,
+                  ),
+                ]
+                // VIEW 2: SUMMARY GRID
+                else ...[
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: CircleOfFifthsModel.defaultKeys.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.8,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  item.major,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? colorScheme.onPrimaryContainer
-                                        : colorScheme.primary,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.secondaryContainer,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    item.minor,
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.onSecondaryContainer,
-                                      fontWeight: FontWeight.w600,
+                    itemBuilder: (context, index) {
+                      final item = CircleOfFifthsModel.defaultKeys[index];
+                      final isSelected = index == _selectedIndex;
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                            _isMinorMode = false;
+                            _selectedView = 0;
+                          });
+                          widget.onKeySelected?.call(item.major);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? colorScheme.primaryContainer
+                                : colorScheme.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant.withValues(
+                                      alpha: 0.5,
+                                    ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    item.major,
+                                    style: textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected
+                                          ? colorScheme.onPrimaryContainer
+                                          : colorScheme.primary,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'IV: ${item.subdominant} | V: ${item.dominant}',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.secondaryContainer,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      item.minor,
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: colorScheme.onSecondaryContainer,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                'IV: ${item.subdominant} | V: ${item.dominant}',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
+                ],
+                const SizedBox(height: 24),
               ],
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
-        ),
-      );
+        );
       },
     );
   }

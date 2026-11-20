@@ -243,6 +243,20 @@ class ChordTransposer {
     String? targetKey,
   }) {
     final trimmed = chordSymbol.trim();
+    final compound = splitCompoundChords(trimmed);
+    if (compound.length > 1) {
+      return compound
+          .map(
+            (part) => transposeChord(
+              part,
+              semitones,
+              preferFlats: preferFlats,
+              targetKey: targetKey,
+            ),
+          )
+          .join('/');
+    }
+
     final match = _chordRegex.firstMatch(trimmed);
     if (match == null) return chordSymbol;
 
@@ -254,13 +268,14 @@ class ChordTransposer {
     if (rootIndex == -1) return chordSymbol;
 
     final newRootIndex = ((rootIndex + semitones) % 12 + 12) % 12;
-    final useFlats = preferFlats ??
+    final useFlats =
+        preferFlats ??
         (targetKey != null
             ? prefersFlatsForKey(targetKey)
             : (root.contains('b') ||
-                root.contains('♭') ||
-                newRootIndex == 5 ||
-                newRootIndex == 10));
+                  root.contains('♭') ||
+                  newRootIndex == 5 ||
+                  newRootIndex == 10));
 
     final newRoot = semitoneToNote(newRootIndex, preferFlats: useFlats);
 
@@ -290,17 +305,48 @@ class ChordTransposer {
     }
     return chordProText.replaceAllMapped(RegExp(r'\[([^\[\]]+)\]'), (match) {
       final content = match.group(1)!;
-      if (!isChordSymbol(content)) {
+      final trimmed = content.trim();
+      final leadingSlash = trimmed.startsWith('/');
+      final trailingSlash = trimmed.length > 1 && trimmed.endsWith('/');
+      final stripped = trimmed
+          .replaceFirst(RegExp(r'^/'), '')
+          .replaceFirst(RegExp(r'/$'), '')
+          .trim();
+
+      if (stripped.isEmpty || splitCompoundChords(stripped).isEmpty) {
         return match.group(0)!;
       }
       final transposed = transposeChord(
-        content,
+        stripped,
         semitones,
         preferFlats: preferFlats,
         targetKey: targetKey,
       );
-      return '[$transposed]';
+      final prefix = leadingSlash ? '/' : '';
+      final suffix = trailingSlash ? '/' : '';
+      return '[$prefix$transposed$suffix]';
     });
+  }
+
+  /// Splits a token into individual chord symbols when it represents multiple
+  /// full chords separated by `/` (e.g., `"D/F#m"` → `["D", "F#m"]`), while
+  /// preserving standard slash-bass chords (e.g., `"D/F#"` → `["D/F#"]`).
+  ///
+  /// Returns an empty list if [token] is neither a valid chord nor a compound chord.
+  static List<String> splitCompoundChords(String token) {
+    final trimmed = token.trim();
+    if (trimmed.isEmpty) return const [];
+    if (isChordSymbol(trimmed)) {
+      return [trimmed];
+    }
+    if (!trimmed.contains('/')) return const [];
+
+    final parts = trimmed.split('/').map((p) => p.trim()).toList();
+    if (parts.length < 2) return const [];
+    if (parts.every(isChordSymbol)) {
+      return parts;
+    }
+    return const [];
   }
 
   /// Returns `true` if [token] is a valid musical chord symbol rather than a section label like `Chorus`.
@@ -370,7 +416,8 @@ class ChordTransposer {
     final rawRoot = match.group(1)!;
     final quality = match.group(2) ?? '';
     final bassNote = match.group(3);
-    final useFlats = preferFlats ??
+    final useFlats =
+        preferFlats ??
         (rawRoot.contains('b') || rawRoot.contains('♭') || rawRoot == 'F');
 
     final rootSemitone = noteToSemitone(rawRoot);
@@ -399,15 +446,18 @@ class ChordTransposer {
     final (intervals, labels, canonicalQuality) = _intervalsForQuality(quality);
 
     final notes = intervals
-        .map((semi) =>
-            semitoneToNote(rootIndex + semi, preferFlats: preferFlats))
+        .map(
+          (semi) => semitoneToNote(rootIndex + semi, preferFlats: preferFlats),
+        )
         .toList();
 
     if (bassNote != null && bassNote.isNotEmpty) {
       final bassSemi = noteToSemitone(bassNote);
       if (bassSemi != -1) {
-        final formattedBass =
-            semitoneToNote(bassSemi, preferFlats: preferFlats);
+        final formattedBass = semitoneToNote(
+          bassSemi,
+          preferFlats: preferFlats,
+        );
         if (!notes.contains(formattedBass)) {
           notes.insert(0, formattedBass);
         }

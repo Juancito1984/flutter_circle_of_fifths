@@ -41,7 +41,8 @@ And grace my fears re[D]lieved.
 
 * **Encabezados de sección**: Las líneas que contengan etiquetas como `[Verse 1]`, `[Chorus]`, `[Intro]`, `[Bridge]` se formatean automáticamente con `sectionStyle`.
 * **Líneas vacías**: Representan separación entre estrofas y aplican el espaciado definido por `stanzaSpacing`.
-* **Acordes con bajo invertido (Slash Chords)**: Soporta acordes compuestos como `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Acordes con bajo invertido (Slash Chords)**: Soporta acordes con bajo en otra nota como `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Acordes compuestos / de paso**: Soporta los formatos `[D][/][F#m]`, `[D/F#m]`, `[Bm/][A]` y `[Bm][/A]`. Todos se muestran juntos sobre la sílaba como `D/F#m` o `Bm/A`, transponen cada acorde por separado y permiten tocar cualquiera de los dos para ver su diagrama.
 
 ---
 

@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:material_ui/material_ui.dart';
+
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_theme.dart';
 
@@ -116,7 +118,8 @@ class _CircleOfFifthsPainter extends CustomPainter {
 
     final paint = Paint()..style = PaintingStyle.fill;
 
-    final effectiveBorderColor = customTheme.borderColor ??
+    final effectiveBorderColor =
+        customTheme.borderColor ??
         colorScheme.outlineVariant.withValues(alpha: isDark ? 0.6 : 0.4);
 
     final borderPaint = Paint()
@@ -129,13 +132,16 @@ class _CircleOfFifthsPainter extends CustomPainter {
     final Color tonicaColor = customTheme.tonicColor ?? colorScheme.primary;
     final Color gradosCuartoQuintoColor =
         customTheme.subdominantDominantColor ?? colorScheme.secondary;
-    final Color acordesMenoresColor = customTheme.minorChordsColor ??
+    final Color acordesMenoresColor =
+        customTheme.minorChordsColor ??
         (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32));
-    final Color disminuidoColor = customTheme.diminishedColor ??
+    final Color disminuidoColor =
+        customTheme.diminishedColor ??
         (isDark ? const Color(0xFF64B5F6) : const Color(0xFF1565C0));
 
     // Dynamic background for inactive sectors adapting cleanly to light/dark themes
-    final Color defaultInactiveSectorColor = customTheme.inactiveSectorColor ??
+    final Color defaultInactiveSectorColor =
+        customTheme.inactiveSectorColor ??
         (isDark
             ? colorScheme.surfaceContainerHigh
             : colorScheme.surfaceContainerLowest);
@@ -158,27 +164,27 @@ class _CircleOfFifthsPainter extends CustomPainter {
           outerSectorColor = tonicaColor;
           textColorOnOuter =
               ThemeData.estimateBrightnessForColor(tonicaColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 11) {
           outerSectorColor = gradosCuartoQuintoColor;
           textColorOnOuter =
               ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 1) {
           outerSectorColor = gradosCuartoQuintoColor;
           textColorOnOuter =
               ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           innerSectorColor = acordesMenoresColor;
           textColorOnInner = Colors.white;
         } else if (visIndex == 2) {
@@ -191,27 +197,27 @@ class _CircleOfFifthsPainter extends CustomPainter {
           innerSectorColor = tonicaColor;
           textColorOnInner =
               ThemeData.estimateBrightnessForColor(tonicaColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 11) {
           innerSectorColor = gradosCuartoQuintoColor;
           textColorOnInner =
               ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 1) {
           innerSectorColor = gradosCuartoQuintoColor;
           textColorOnInner =
               ThemeData.estimateBrightnessForColor(gradosCuartoQuintoColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black87;
+                  Brightness.dark
+              ? Colors.white
+              : Colors.black87;
           outerSectorColor = acordesMenoresColor;
           textColorOnOuter = Colors.white;
         } else if (visIndex == 2) {
@@ -324,7 +330,8 @@ class _CircleOfFifthsPainter extends CustomPainter {
 
     // --- CENTER CORE WITH BRAND ---
     final coreRadius = radius * 0.25;
-    final effectiveHubColor = customTheme.centerHubColor ??
+    final effectiveHubColor =
+        customTheme.centerHubColor ??
         (isDark
             ? colorScheme.surfaceContainerHigh
             : colorScheme.surfaceContainerLowest);
@@ -347,12 +354,7 @@ class _CircleOfFifthsPainter extends CustomPainter {
     }
   }
 
-  void _drawText(
-    Canvas canvas,
-    String text,
-    Offset position,
-    TextStyle style,
-  ) {
+  void _drawText(Canvas canvas, String text, Offset position, TextStyle style) {
     if (text.isEmpty) return;
     final textSpan = TextSpan(text: text, style: style);
     final textPainter = TextPainter(

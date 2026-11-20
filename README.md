@@ -68,7 +68,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_circle_of_fifths: ^2.0.0
+  flutter_circle_of_fifths: ^2.0.1
   material_ui: ^1.11.1
 ```
 

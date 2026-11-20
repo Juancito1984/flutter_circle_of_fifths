@@ -2,17 +2,24 @@ import 'chord_model.dart';
 
 /// Represents a paired chord and lyric fragment within a song line.
 class ChordLyricSegment {
-  /// Optional chord symbol positioned above [lyric] (e.g., `"C"`, `"G7"`).
+  /// Optional chord symbol positioned above [lyric] (e.g., `"C"`, `"G7"`, `"D/F#m"`).
   final String? chord;
+
+  /// Individual chord symbols positioned above [lyric].
+  ///
+  /// For a single chord (e.g., `"C"` or `"D/F#"`), contains one item.
+  /// For compound chords (e.g., `[D][/][F#m]` or `[D/F#m]`), contains each
+  /// chord individually (e.g., `["D", "F#m"]`) so each one can be tapped and
+  /// transposed independently.
+  final List<String> chords;
 
   /// Lyric text fragment positioned below [chord].
   final String lyric;
 
   /// Creates a [ChordLyricSegment] pair.
-  const ChordLyricSegment({
-    this.chord,
-    required this.lyric,
-  });
+  ChordLyricSegment({this.chord, List<String>? chords, required this.lyric})
+    : chords =
+          chords ?? (chord != null && chord.isNotEmpty ? [chord] : const []);
 }
 
 /// Classification of a line inside a [ChordSheetDocument].
@@ -103,8 +110,8 @@ class ChordSheetDocument {
       }
 
       // Check ChordPro directives: {title: ...}, {subtitle: ...}, {key: ...}, {comment: ...}
-      final directiveMatch =
-          RegExp(r'^\{([a-zA-Z_]+)\s*:\s*(.+)\}$').firstMatch(trimmed);
+      final directiveMatch = RegExp(r'^\{([a-zA-Z_]+)\s*:\s*(.+)\}$')
+          .firstMatch(trimmed);
       if (directiveMatch != null) {
         final tag = directiveMatch.group(1)!.toLowerCase();
         final value = directiveMatch.group(2)!.trim();
@@ -143,11 +150,10 @@ class ChordSheetDocument {
       }
 
       // Check standalone section header like [Chorus] or [Verse 1]
-      final sectionOnlyMatch =
-          RegExp(r'^\[([^\[\]]+)\]$').firstMatch(trimmed);
+      final sectionOnlyMatch = RegExp(r'^\[([^\[\]]+)\]$').firstMatch(trimmed);
       if (sectionOnlyMatch != null) {
         final inside = sectionOnlyMatch.group(1)!.trim();
-        if (!ChordTransposer.isChordSymbol(inside)) {
+        if (ChordTransposer.splitCompoundChords(inside).isEmpty) {
           lines.add(
             ChordSheetLine(
               type: ChordSheetLineType.section,
@@ -210,30 +216,125 @@ class ChordSheetDocument {
     for (int i = 0; i < matches.length; i++) {
       final match = matches[i];
       final rawToken = match.group(1)!.trim();
-      final nextStart =
-          (i + 1 < matches.length) ? matches[i + 1].start : line.length;
-      final followingLyric = line.substring(match.end, nextStart);
+      final initialParsed = _parseTokenWithSlashes(rawToken);
 
-      if (ChordTransposer.isChordSymbol(rawToken)) {
-        final transposedChord = ChordTransposer.transposeChord(
-          rawToken,
-          transposeSemitones,
-          preferFlats: preferFlats,
-          targetKey: targetKey,
-        );
-        uniqueChordsSet.add(transposedChord);
+      final canStartTrailingSlashGroup =
+          initialParsed.endsWithSlash &&
+          i + 1 < matches.length &&
+          line.substring(match.end, matches[i + 1].start).trim().isEmpty &&
+          _parseTokenWithSlashes(matches[i + 1].group(1)!.trim())
+              .chords
+              .isNotEmpty;
+
+      if (!initialParsed.startsWithSlash &&
+          initialParsed.chords.isNotEmpty &&
+          (!initialParsed.endsWithSlash || canStartTrailingSlashGroup)) {
+        final groupChords = <String>[];
+        for (final part in initialParsed.chords) {
+          final transposed = ChordTransposer.transposeChord(
+            part,
+            transposeSemitones,
+            preferFlats: preferFlats,
+            targetKey: targetKey,
+          );
+          groupChords.add(transposed);
+          uniqueChordsSet.add(transposed);
+        }
+
+        var hasTrailingSlash = initialParsed.endsWithSlash;
+
+        // Merge chained chords separated by [/] (e.g. [D][/][F#m]),
+        // trailing slash (e.g. [Bm/][A]), or leading slash (e.g. [Bm][/A]).
+        while (i + 1 < matches.length &&
+            line
+                .substring(matches[i].end, matches[i + 1].start)
+                .trim()
+                .isEmpty) {
+          final nextMatch = matches[i + 1];
+          final nextToken = nextMatch.group(1)!.trim();
+          final nextParsed = _parseTokenWithSlashes(nextToken);
+
+          if (hasTrailingSlash && nextParsed.chords.isNotEmpty) {
+            for (final part in nextParsed.chords) {
+              final transposed = ChordTransposer.transposeChord(
+                part,
+                transposeSemitones,
+                preferFlats: preferFlats,
+                targetKey: targetKey,
+              );
+              groupChords.add(transposed);
+              uniqueChordsSet.add(transposed);
+            }
+            hasTrailingSlash = nextParsed.endsWithSlash;
+            i += 1;
+            continue;
+          }
+
+          if (!hasTrailingSlash &&
+              nextParsed.startsWithSlash &&
+              nextParsed.chords.isNotEmpty) {
+            for (final part in nextParsed.chords) {
+              final transposed = ChordTransposer.transposeChord(
+                part,
+                transposeSemitones,
+                preferFlats: preferFlats,
+                targetKey: targetKey,
+              );
+              groupChords.add(transposed);
+              uniqueChordsSet.add(transposed);
+            }
+            hasTrailingSlash = nextParsed.endsWithSlash;
+            i += 1;
+            continue;
+          }
+
+          if (!hasTrailingSlash &&
+              nextToken == '/' &&
+              i + 2 < matches.length &&
+              line
+                  .substring(nextMatch.end, matches[i + 2].start)
+                  .trim()
+                  .isEmpty) {
+            final afterSepToken = matches[i + 2].group(1)!.trim();
+            final afterSepParsed = _parseTokenWithSlashes(afterSepToken);
+            if (afterSepParsed.chords.isNotEmpty) {
+              for (final part in afterSepParsed.chords) {
+                final transposed = ChordTransposer.transposeChord(
+                  part,
+                  transposeSemitones,
+                  preferFlats: preferFlats,
+                  targetKey: targetKey,
+                );
+                groupChords.add(transposed);
+                uniqueChordsSet.add(transposed);
+              }
+              hasTrailingSlash = afterSepParsed.endsWithSlash;
+              i += 2;
+              continue;
+            }
+          }
+
+          break;
+        }
+
+        final nextStart = (i + 1 < matches.length)
+            ? matches[i + 1].start
+            : line.length;
+        final followingLyric = line.substring(matches[i].end, nextStart);
 
         // Split lyric into word chunks so long phrases wrap naturally in Flutter Wrap
         _appendWordSegments(
           segments,
-          chord: transposedChord,
+          chords: groupChords,
           lyric: followingLyric,
         );
       } else {
+        final nextStart = (i + 1 < matches.length)
+            ? matches[i + 1].start
+            : line.length;
+        final followingLyric = line.substring(match.end, nextStart);
         segments.add(
-          ChordLyricSegment(
-            lyric: '[${match.group(1)}]$followingLyric',
-          ),
+          ChordLyricSegment(lyric: '[${match.group(1)}]$followingLyric'),
         );
       }
     }
@@ -241,13 +342,38 @@ class ChordSheetDocument {
     return segments;
   }
 
+  static ({List<String> chords, bool startsWithSlash, bool endsWithSlash})
+  _parseTokenWithSlashes(String token) {
+    final trimmed = token.trim();
+    if (trimmed.isEmpty || trimmed == '/') {
+      return (chords: const [], startsWithSlash: false, endsWithSlash: false);
+    }
+    final startsWithSlash = trimmed.startsWith('/');
+    final endsWithSlash = trimmed.length > 1 && trimmed.endsWith('/');
+    final stripped = trimmed
+        .replaceFirst(RegExp(r'^/'), '')
+        .replaceFirst(RegExp(r'/$'), '')
+        .trim();
+    if (stripped.isEmpty) {
+      return (chords: const [], startsWithSlash: false, endsWithSlash: false);
+    }
+    return (
+      chords: ChordTransposer.splitCompoundChords(stripped),
+      startsWithSlash: startsWithSlash,
+      endsWithSlash: endsWithSlash,
+    );
+  }
+
   static void _appendWordSegments(
     List<ChordLyricSegment> target, {
-    required String chord,
+    required List<String> chords,
     required String lyric,
   }) {
+    final combinedChord = chords.join('/');
     if (lyric.isEmpty) {
-      target.add(ChordLyricSegment(chord: chord, lyric: ''));
+      target.add(
+        ChordLyricSegment(chord: combinedChord, chords: chords, lyric: ''),
+      );
       return;
     }
 
@@ -255,23 +381,22 @@ class ChordSheetDocument {
     // so that long lines wrap gracefully on narrow screens without breaking chord alignment.
     final wordMatches = RegExp(r'\S+\s*|\s+').allMatches(lyric).toList();
     if (wordMatches.isEmpty) {
-      target.add(ChordLyricSegment(chord: chord, lyric: lyric));
+      target.add(
+        ChordLyricSegment(chord: combinedChord, chords: chords, lyric: lyric),
+      );
       return;
     }
 
     target.add(
       ChordLyricSegment(
-        chord: chord,
+        chord: combinedChord,
+        chords: chords,
         lyric: wordMatches.first.group(0)!,
       ),
     );
 
     for (int i = 1; i < wordMatches.length; i++) {
-      target.add(
-        ChordLyricSegment(
-          lyric: wordMatches[i].group(0)!,
-        ),
-      );
+      target.add(ChordLyricSegment(lyric: wordMatches[i].group(0)!));
     }
   }
 }

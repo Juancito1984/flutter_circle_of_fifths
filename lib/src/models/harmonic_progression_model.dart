@@ -85,8 +85,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: 'I - V - vi - IV (Axis of Awesome)',
       genre: ProgressionGenre.popRock,
-      description:
-          'The most successful chord progression in modern music history. Used in hundreds of hits including "Don\'t Stop Believin\'", "Let It Be", "With or Without You", and "Someone Like You".',
+      description: 'The most successful chord progression in modern music history. Used in hundreds of hits including "Don\'t Stop Believin\'", "Let It Be", "With or Without You", and "Someone Like You".',
       steps: [
         ProgressionStep(
           romanNumeral: 'I',
@@ -117,8 +116,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: 'ii - V - I (Jazz Cadence)',
       genre: ProgressionGenre.jazz,
-      description:
-          'The backbone of Jazz harmony and Broadway standards. Creates smooth voice leading with strong dominant resolution to the tonic.',
+      description: 'The backbone of Jazz harmony and Broadway standards. Creates smooth voice leading with strong dominant resolution to the tonic.',
       steps: [
         ProgressionStep(
           romanNumeral: 'ii7',
@@ -143,8 +141,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: 'I - vi - IV - V (50s Doo-Wop)',
       genre: ProgressionGenre.popRock,
-      description:
-          'The defining sound of 1950s rock and roll and doo-wop ballads. Classic examples: "Stand by Me", "Earth Angel", "Every Breath You Take".',
+      description: 'The defining sound of 1950s rock and roll and doo-wop ballads. Classic examples: "Stand by Me", "Earth Angel", "Every Breath You Take".',
       steps: [
         ProgressionStep(
           romanNumeral: 'I',
@@ -175,8 +172,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: 'Pachelbel Canon',
       genre: ProgressionGenre.classical,
-      description:
-          'Johann Pachelbel\'s timeless sequence (I - V - vi - iii - IV - I - IV - V). Adapted in pop songs like "Memories" by Maroon 5 and "Basket Case" by Green Day.',
+      description: 'Johann Pachelbel\'s timeless sequence (I - V - vi - iii - IV - I - IV - V). Adapted in pop songs like "Memories" by Maroon 5 and "Basket Case" by Green Day.',
       steps: [
         ProgressionStep(
           romanNumeral: 'I',
@@ -231,8 +227,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: '12-Bar Blues',
       genre: ProgressionGenre.blues,
-      description:
-          'The foundational 12-bar blues form (I7 - IV7 - I7 - V7 - IV7 - I7). Root of Rock and Roll, R&B and Funk.',
+      description: 'The foundational 12-bar blues form (I7 - IV7 - I7 - V7 - IV7 - I7). Root of Rock and Roll, R&B and Funk.',
       steps: [
         ProgressionStep(
           romanNumeral: 'I7',
@@ -263,8 +258,7 @@ class HarmonicProgression {
     HarmonicProgression(
       name: 'Andalusian Cadence (vi - V - IV - III)',
       genre: ProgressionGenre.classical,
-      description:
-          'Traditional descending minor tetrachord cadence used in Flamenco, Classical, and Rock (e.g. "Hit the Road Jack", "Stairway to Heaven", "Sultans of Swing").',
+      description: 'Traditional descending minor tetrachord cadence used in Flamenco, Classical, and Rock (e.g. "Hit the Road Jack", "Stairway to Heaven", "Sultans of Swing").',
       steps: [
         ProgressionStep(
           romanNumeral: 'i',
@@ -338,8 +332,11 @@ class HarmonicProgression {
     if (keyRoot == -1 || chordRoot == -1) return chordSymbol;
 
     final diff = ((chordRoot - keyRoot) % 12 + 12) % 12;
-    final isMinor = chordInfo.quality.startsWith('m') && !chordInfo.quality.startsWith('maj');
-    final isDim = chordInfo.quality.contains('dim') || chordInfo.quality.contains('°');
+    final isMinor =
+        chordInfo.quality.startsWith('m') &&
+        !chordInfo.quality.startsWith('maj');
+    final isDim =
+        chordInfo.quality.contains('dim') || chordInfo.quality.contains('°');
 
     String roman;
     switch (diff) {

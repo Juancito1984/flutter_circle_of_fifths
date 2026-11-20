@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/chord_model.dart';
 
 /// Interactive vector Piano Keybed widget (1 or 2 octaves) that highlights
@@ -85,8 +86,9 @@ class PianoKeybedWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final activeKeys = _computeActiveKeys();
-    final rootSemitone =
-        rootNote != null ? ChordTransposer.noteToSemitone(rootNote!) : -1;
+    final rootSemitone = rootNote != null
+        ? ChordTransposer.noteToSemitone(rootNote!)
+        : -1;
 
     return SizedBox(
       height: height,
@@ -140,13 +142,7 @@ class PianoKeybedWidget extends StatelessWidget {
     final blackKeyHeight = size.height * 0.60;
 
     const whiteSemitones = [0, 2, 4, 5, 7, 9, 11];
-    const blackSemitoneAfterWhite = <int, int>{
-      0: 1,
-      1: 3,
-      3: 6,
-      4: 8,
-      5: 10,
-    };
+    const blackSemitoneAfterWhite = <int, int>{0: 1, 1: 3, 3: 6, 4: 8, 5: 10};
 
     // Check black keys first since they sit on top of white keys
     if (pos.dy <= blackKeyHeight) {
@@ -203,13 +199,7 @@ class _PianoKeybedPainter extends CustomPainter {
   });
 
   static const List<int> _whiteSemitones = [0, 2, 4, 5, 7, 9, 11];
-  static const Map<int, int> _blackAfterWhite = {
-    0: 1,
-    1: 3,
-    3: 6,
-    4: 8,
-    5: 10,
-  };
+  static const Map<int, int> _blackAfterWhite = {0: 1, 1: 3, 3: 6, 4: 8, 5: 10};
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -267,20 +257,20 @@ class _PianoKeybedPainter extends CustomPainter {
         final textColor = isRoot
             ? colorScheme.onPrimary
             : isHighlighted
-                ? (customActiveKeyColor != null
-                    ? (ThemeData.estimateBrightnessForColor(effectiveActiveWhiteColor) == Brightness.dark
+            ? (customActiveKeyColor != null
+                  ? (ThemeData.estimateBrightnessForColor(
+                              effectiveActiveWhiteColor,
+                            ) ==
+                            Brightness.dark
                         ? Colors.white
                         : Colors.black87)
-                    : colorScheme.onPrimaryContainer)
-                : Colors.black54;
+                  : colorScheme.onPrimaryContainer)
+            : Colors.black54;
 
         _drawCenteredText(
           canvas,
           label,
-          Offset(
-            i * whiteKeyWidth + whiteKeyWidth / 2,
-            size.height - 18,
-          ),
+          Offset(i * whiteKeyWidth + whiteKeyWidth / 2, size.height - 18),
           TextStyle(
             color: textColor,
             fontWeight: FontWeight.bold,

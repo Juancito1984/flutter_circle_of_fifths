@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/chord_model.dart';
 
 /// Vector Fretboard diagram widget for Guitar (6 strings) and Ukulele (4 strings).
@@ -257,12 +258,7 @@ class _FretboardPainter extends CustomPainter {
     }
   }
 
-  void _drawText(
-    Canvas canvas,
-    String text,
-    Offset center,
-    TextStyle style,
-  ) {
+  void _drawText(Canvas canvas, String text, Offset center, TextStyle style) {
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
       textAlign: TextAlign.center,

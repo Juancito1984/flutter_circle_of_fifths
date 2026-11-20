@@ -54,7 +54,8 @@ class ScaleFormula {
       semitoneOffsets: [0, 2, 4, 5, 7, 9, 11],
       degreeLabels: ['1', '2', '3', '4', '5', '6', '7'],
       steps: [2, 2, 1, 2, 2, 2, 1],
-      description: 'The foundation of Western music. Bright, stable, joyful and heroic.',
+      description:
+          'The foundation of Western music. Bright, stable, joyful and heroic.',
     ),
     ScaleFormula(
       name: 'Dorian',
@@ -160,7 +161,8 @@ class ScaleFormula {
   List<String> getNotes(String rootNote, {bool? preferFlats}) {
     final rootIndex = ChordTransposer.noteToSemitone(rootNote);
     if (rootIndex == -1) return const [];
-    final useFlats = preferFlats ??
+    final useFlats =
+        preferFlats ??
         (rootNote.contains('b') ||
             rootNote.contains('♭') ||
             rootIndex == 5 ||

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/chord_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import 'fretboard_widget.dart';
@@ -75,148 +76,148 @@ class _ChordInspectorSheetState extends State<ChordInspectorSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-        // Drag handle
-        Container(
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Chord Title & Root/Quality Badge
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    info.symbol,
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${labels.rootLabel} ${info.root}${info.bassNote != null ? ' (${labels.bassLabel} ${info.bassNote})' : ''}',
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    Text(
-                      '${labels.intervalsLabel} ${info.intervalLabels.join(' - ')}',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(2),
             ),
-            IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.close_rounded),
-              tooltip: labels.closeTooltip,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        // Constituent Notes Chips
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(16),
           ),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          const SizedBox(height: 16),
+
+          // Chord Title & Root/Quality Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                labels.notesLabel,
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              for (int i = 0; i < info.notes.length; i++)
-                Chip(
-                  visualDensity: VisualDensity.compact,
-                  backgroundColor: i == 0
-                      ? colorScheme.primary
-                      : colorScheme.secondaryContainer,
-                  label: Text(
-                    info.notes[i],
-                    style: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: i == 0
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSecondaryContainer,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      info.symbol,
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${labels.rootLabel} ${info.root}${info.bassNote != null ? ' (${labels.bassLabel} ${info.bassNote})' : ''}',
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        '${labels.intervalsLabel} ${info.intervalLabels.join(' - ')}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.close_rounded),
+                tooltip: labels.closeTooltip,
+              ),
             ],
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Instrument Selector
-        SegmentedButton<InstrumentType>(
-          segments: [
-            ButtonSegment(
-              value: InstrumentType.guitar,
-              label: Text(labels.guitarLabel),
-              icon: const Icon(Icons.music_note_rounded),
+          // Constituent Notes Chips
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(16),
             ),
-            ButtonSegment(
-              value: InstrumentType.ukulele,
-              label: Text(labels.ukuleleLabel),
-              icon: const Icon(Icons.audiotrack_rounded),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  labels.notesLabel,
+                  style: textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                for (int i = 0; i < info.notes.length; i++)
+                  Chip(
+                    visualDensity: VisualDensity.compact,
+                    backgroundColor: i == 0
+                        ? colorScheme.primary
+                        : colorScheme.secondaryContainer,
+                    label: Text(
+                      info.notes[i],
+                      style: textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: i == 0
+                            ? colorScheme.onPrimary
+                            : colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            ButtonSegment(
-              value: InstrumentType.piano,
-              label: Text(labels.pianoLabel),
-              icon: const Icon(Icons.piano_rounded),
-            ),
-          ],
-          selected: {_selectedInstrument},
-          onSelectionChanged: (selection) {
-            setState(() {
-              _selectedInstrument = selection.first;
-            });
-          },
-        ),
-        const SizedBox(height: 20),
+          ),
+          const SizedBox(height: 16),
 
-        // Diagram View
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: _buildInstrumentDiagram(info),
-        ),
-      ],
-    ),
-  );
+          // Instrument Selector
+          SegmentedButton<InstrumentType>(
+            segments: [
+              ButtonSegment(
+                value: InstrumentType.guitar,
+                label: Text(labels.guitarLabel),
+                icon: const Icon(Icons.music_note_rounded),
+              ),
+              ButtonSegment(
+                value: InstrumentType.ukulele,
+                label: Text(labels.ukuleleLabel),
+                icon: const Icon(Icons.audiotrack_rounded),
+              ),
+              ButtonSegment(
+                value: InstrumentType.piano,
+                label: Text(labels.pianoLabel),
+                icon: const Icon(Icons.piano_rounded),
+              ),
+            ],
+            selected: {_selectedInstrument},
+            onSelectionChanged: (selection) {
+              setState(() {
+                _selectedInstrument = selection.first;
+              });
+            },
+          ),
+          const SizedBox(height: 20),
+
+          // Diagram View
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _buildInstrumentDiagram(info),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildInstrumentDiagram(ChordInfo info) {

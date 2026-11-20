@@ -28,14 +28,8 @@ void main() {
       expect(ChordTransposer.transposeChord('C', 2), 'D');
       expect(ChordTransposer.transposeChord('G7', 2), 'A7');
       expect(ChordTransposer.transposeChord('C/G', 2), 'D/A');
-      expect(
-        ChordTransposer.transposeChord('C', 5, targetKey: 'F'),
-        'F',
-      );
-      expect(
-        ChordTransposer.transposeChord('F', 5, targetKey: 'Bb'),
-        'Bb',
-      );
+      expect(ChordTransposer.transposeChord('C', 5, targetKey: 'F'), 'F');
+      expect(ChordTransposer.transposeChord('F', 5, targetKey: 'Bb'), 'Bb');
     });
 
     test('calculates semitones between Circle of Fifths keys', () {
@@ -123,26 +117,22 @@ That [C]saved a [G7]wretch like [C]me
       );
       expect(wavSingle.length, greaterThan(44));
       // Check RIFF header
-      expect(
-        String.fromCharCodes(wavSingle.sublist(0, 4)),
-        'RIFF',
-      );
-      expect(
-        String.fromCharCodes(wavSingle.sublist(8, 12)),
-        'WAVE',
-      );
+      expect(String.fromCharCodes(wavSingle.sublist(0, 4)), 'RIFF');
+      expect(String.fromCharCodes(wavSingle.sublist(8, 12)), 'WAVE');
 
-      final wavChord = SimpleAudioSynthesizer.synthesizeChordNotes(
-        ['C', 'E', 'G'],
-        durationSeconds: 0.1,
-      );
+      final wavChord = SimpleAudioSynthesizer.synthesizeChordNotes([
+        'C',
+        'E',
+        'G',
+      ], durationSeconds: 0.1);
       expect(wavChord.length, greaterThan(44));
     });
   });
 
   group('Widget Tests', () {
-    testWidgets('CircleOfFifthsWheelWidget renders without errors',
-        (tester) async {
+    testWidgets('CircleOfFifthsWheelWidget renders without errors', (
+      tester,
+    ) async {
       int selectedIndex = 0;
       bool isMinorMode = false;
 
@@ -188,22 +178,23 @@ That [C]saved a [G7]wretch like [C]me
       );
 
       // Tap at the outer major ring at 12:00 (x: 150, y: 25)
-      await tester.tapAt(tester.getCenter(find.byType(CircleOfFifthsWheelWidget)) - const Offset(0, 125));
+      await tester.tapAt(
+        tester.getCenter(find.byType(CircleOfFifthsWheelWidget)) -
+            const Offset(0, 125),
+      );
       await tester.pump();
       expect(tapCount, 1);
     });
 
-    testWidgets('ScaleDetailCard renders scale details for C Major',
-        (tester) async {
+    testWidgets('ScaleDetailCard renders scale details for C Major', (
+      tester,
+    ) async {
       final cMajor = CircleOfFifthsModel.defaultKeys[0];
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ScaleDetailCard(
-              model: cMajor,
-              isMinorMode: false,
-            ),
+            body: ScaleDetailCard(model: cMajor, isMinorMode: false),
           ),
         ),
       );
@@ -212,109 +203,262 @@ That [C]saved a [G7]wretch like [C]me
       expect(find.byType(ScaleDetailCard), findsOneWidget);
     });
 
-    testWidgets('CircleOfFifthsSheet displays interactive wheel, title and custom labels',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: CircleOfFifthsSheet(
-              title: 'Círculo de Quintas',
-              interactiveWheelLabel: 'Rueda Interactiva',
-              summaryViewLabel: 'Vista Resumen',
+    testWidgets(
+      'CircleOfFifthsSheet displays interactive wheel, title and custom labels',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: CircleOfFifthsSheet(
+                title: 'Círculo de Quintas',
+                interactiveWheelLabel: 'Rueda Interactiva',
+                summaryViewLabel: 'Vista Resumen',
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Círculo de Quintas'), findsOneWidget);
-      expect(find.text('Rueda Interactiva'), findsOneWidget);
-      expect(find.text('Vista Resumen'), findsOneWidget);
-    });
+        expect(find.text('Círculo de Quintas'), findsOneWidget);
+        expect(find.text('Rueda Interactiva'), findsOneWidget);
+        expect(find.text('Vista Resumen'), findsOneWidget);
+      },
+    );
 
-    testWidgets('ChordSheetViewer renders lyrics, chords, and transposes on tap',
-        (tester) async {
-      const songText = '''
+    testWidgets(
+      'ChordSheetViewer renders lyrics, chords, and transposes on tap',
+      (tester) async {
+        const songText = '''
 [C]Amazing [F]grace, how [C]sweet the sound
 That [C]saved a [G7]wretch like [C]me
 ''';
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: ChordSheetViewer(
-                songText: songText,
-                originalKey: 'C',
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(songText: songText, originalKey: 'C'),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(ChordSheetViewer), findsOneWidget);
-      expect(find.text('G7'), findsWidgets);
+        expect(find.byType(ChordSheetViewer), findsOneWidget);
+        expect(find.text('G7'), findsWidgets);
 
-      // Tap +1 semitone button
-      await tester.tap(find.byTooltip('+1 Semitone'));
-      await tester.pumpAndSettle();
+        // Tap +1 semitone button
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('+1'), findsOneWidget);
-    });
+        expect(find.text('+1'), findsOneWidget);
+      },
+    );
 
-    testWidgets('ChordSheetViewer hides chords and toolbar when showChords is false',
-        (tester) async {
-      const songText = '''
+    testWidgets(
+      'ChordSheetViewer hides chords and toolbar when showChords is false',
+      (tester) async {
+        const songText = '''
 [C]Amazing [F]grace, how [C]sweet the sound
 That [C]saved a [G7]wretch like [C]me
 ''';
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: ChordSheetViewer(
-                songText: songText,
-                showChords: false,
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(songText: songText, showChords: false),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(ChordSheetViewer), findsOneWidget);
-      expect(find.text('Amazing grace, how sweet the sound'), findsOneWidget);
-      expect(find.text('G7'), findsNothing);
-      expect(find.text('C'), findsNothing);
-      expect(find.byTooltip('+1 Semitone'), findsNothing);
-    });
+        expect(find.byType(ChordSheetViewer), findsOneWidget);
+        expect(find.text('Amazing grace, how sweet the sound'), findsOneWidget);
+        expect(find.text('G7'), findsNothing);
+        expect(find.text('C'), findsNothing);
+        expect(find.byTooltip('+1 Semitone'), findsNothing);
+      },
+    );
 
-    testWidgets('ProgressionBuilderWidget and ScaleModesWidget render cleanly',
-        (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ProgressionBuilderWidget(
-                    activeKey: 'C',
-                    labels: CircleOfFifthsLabels.spanish,
-                  ),
-                  ScaleModesWidget(
-                    rootNote: 'C',
-                    labels: CircleOfFifthsLabels.spanish,
-                  ),
-                ],
+    testWidgets(
+      'ProgressionBuilderWidget and ScaleModesWidget render cleanly',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ProgressionBuilderWidget(
+                      activeKey: 'C',
+                      labels: CircleOfFifthsLabels.spanish,
+                    ),
+                    ScaleModesWidget(
+                      rootNote: 'C',
+                      labels: CircleOfFifthsLabels.spanish,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        );
+
+        expect(find.byType(ProgressionBuilderWidget), findsOneWidget);
+        expect(find.byType(ScaleModesWidget), findsOneWidget);
+        expect(find.text('Progresión Armónica'), findsOneWidget);
+        expect(find.text('Modos (7)'), findsOneWidget);
+      },
+    );
+
+    test('ChordSheetDocument parses [D][/][F#m] and [D/F#m] equivalently and preserves [D/F#]', () {
+      final docFormat1 = ChordSheetDocument.parse(
+        '[D][/][F#m]Amazing [D/F#]grace',
+        transposeSemitones: 2,
+      );
+      final docFormat2 = ChordSheetDocument.parse(
+        '[D/F#m]Amazing [D/F#]grace',
+        transposeSemitones: 2,
       );
 
-      expect(find.byType(ProgressionBuilderWidget), findsOneWidget);
-      expect(find.byType(ScaleModesWidget), findsOneWidget);
-      expect(find.text('Progresión Armónica'), findsOneWidget);
-      expect(find.text('Modos (7)'), findsOneWidget);
+      expect(docFormat1.uniqueChords, ['E', 'G#m', 'E/G#']);
+      expect(docFormat2.uniqueChords, ['E', 'G#m', 'E/G#']);
+
+      final seg1 = docFormat1.lines.first.segments.first;
+      final seg2 = docFormat2.lines.first.segments.first;
+
+      expect(seg1.chord, 'E/G#m');
+      expect(seg1.chords, ['E', 'G#m']);
+      expect(seg1.lyric, 'Amazing ');
+
+      expect(seg2.chord, 'E/G#m');
+      expect(seg2.chords, ['E', 'G#m']);
+      expect(seg2.lyric, 'Amazing ');
+
+      final slashBassSeg = docFormat2.lines.first.segments[1];
+      expect(slashBassSeg.chord, 'E/G#');
+      expect(slashBassSeg.chords, ['E/G#']);
+      expect(slashBassSeg.lyric, 'grace');
+
+      expect(
+        ChordTransposer.transposeLyrics('[D][/][F#m]Amazing [D/F#m]grace', 2),
+        '[E][/][G#m]Amazing [E/G#m]grace',
+      );
     });
+
+    testWidgets(
+      'ChordSheetViewer renders [D][/][F#m] and [D/F#m] as D/F#m, transposes both, and inspects each chord',
+      (tester) async {
+        final tappedChords = <String>[];
+        const songText = '[D][/][F#m]Amazing [D/F#m]grace';
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(
+                  songText: songText,
+                  originalKey: 'D',
+                  showChordSummaryBar: false,
+                  showDiagramModalOnTap: false,
+                  onTapChord: (info) => tappedChords.add(info.symbol),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('[/]'), findsNothing);
+        expect(find.text('D'), findsNWidgets(2));
+        expect(find.text('F#m'), findsNWidgets(2));
+
+        await tester.tap(find.text('D').first);
+        await tester.tap(find.text('F#m').first);
+        expect(tappedChords, ['D', 'F#m']);
+
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('D#'), findsNWidgets(2));
+        expect(find.text('Gm'), findsNWidgets(2));
+
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('E'), findsNWidgets(2));
+        expect(find.text('G#m'), findsNWidgets(2));
+      },
+    );
+
+    test(
+      'ChordSheetDocument and transposeLyrics support [Bm/][A] and [Bm][/A]',
+      () {
+        final docTrailing = ChordSheetDocument.parse(
+          '[Bm/][A]Amazing',
+          transposeSemitones: 2,
+        );
+        final docLeading = ChordSheetDocument.parse(
+          '[Bm][/A]Amazing',
+          transposeSemitones: 2,
+        );
+
+        expect(docTrailing.uniqueChords, ['C#m', 'B']);
+        expect(docLeading.uniqueChords, ['C#m', 'B']);
+
+        final segTrailing = docTrailing.lines.first.segments.first;
+        final segLeading = docLeading.lines.first.segments.first;
+
+        expect(segTrailing.chord, 'C#m/B');
+        expect(segTrailing.chords, ['C#m', 'B']);
+        expect(segTrailing.lyric, 'Amazing');
+
+        expect(segLeading.chord, 'C#m/B');
+        expect(segLeading.chords, ['C#m', 'B']);
+        expect(segLeading.lyric, 'Amazing');
+
+        expect(
+          ChordTransposer.transposeLyrics('[Bm/][A]Amazing [Bm][/A]grace', 2),
+          '[C#m/][B]Amazing [C#m][/B]grace',
+        );
+      },
+    );
+
+    testWidgets(
+      'ChordSheetViewer renders [Bm/][A] and [Bm][/A] as Bm/A and transposes both',
+      (tester) async {
+        final tappedChords = <String>[];
+        const songText = '[Bm/][A]Amazing [Bm][/A]grace';
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(
+                  songText: songText,
+                  originalKey: 'D',
+                  showChordSummaryBar: false,
+                  showDiagramModalOnTap: false,
+                  onTapChord: (info) => tappedChords.add(info.symbol),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('[Bm/]'), findsNothing);
+        expect(find.text('[/A]'), findsNothing);
+        expect(find.text('Bm'), findsNWidgets(2));
+        expect(find.text('A'), findsNWidgets(2));
+
+        await tester.tap(find.text('Bm').first);
+        await tester.tap(find.text('A').first);
+        expect(tappedChords, ['Bm', 'A']);
+
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Cm'), findsNWidgets(2));
+        expect(find.text('A#'), findsNWidgets(2));
+      },
+    );
   });
 }

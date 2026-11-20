@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/chord_model.dart';
 import '../models/chord_sheet_parser.dart';
 import '../models/circle_of_fifths_model.dart';
@@ -196,7 +197,8 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final effectiveKey = _selectedTargetKey ??
+    final effectiveKey =
+        _selectedTargetKey ??
         (widget.originalKey != null
             ? ChordTransposer.transposeChord(widget.originalKey!, _semitones)
             : null);
@@ -207,21 +209,24 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
       targetKey: effectiveKey,
     );
 
-    final defaultLyricStyle = widget.lyricStyle ??
+    final defaultLyricStyle =
+        widget.lyricStyle ??
         textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurface,
           height: 1.35,
         ) ??
         const TextStyle(fontSize: 16);
 
-    final defaultChordStyle = widget.chordStyle ??
+    final defaultChordStyle =
+        widget.chordStyle ??
         textTheme.labelLarge?.copyWith(
           color: colorScheme.primary,
           fontWeight: FontWeight.bold,
         ) ??
         const TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
 
-    final defaultSectionStyle = widget.sectionStyle ??
+    final defaultSectionStyle =
+        widget.sectionStyle ??
         textTheme.titleSmall?.copyWith(
           color: colorScheme.secondary,
           fontWeight: FontWeight.bold,
@@ -282,8 +287,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           final isCompact = constraints.maxWidth < 460;
 
           final semitoneStepper = Row(
-            mainAxisSize:
-                isCompact ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize: isCompact ? MainAxisSize.max : MainAxisSize.min,
             children: [
               Icon(
                 Icons.swap_vert_circle_outlined,
@@ -327,15 +331,11 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
                 icon: const Icon(Icons.add_rounded, size: 18),
                 tooltip: '+1 Semitone',
               ),
-
             ],
           );
 
           final dropdownBox = Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 2,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(10),
@@ -343,9 +343,10 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
             child: DropdownButton<String>(
               isDense: true,
               isExpanded: isCompact,
-              value: CircleOfFifthsModel.defaultKeys.any(
-                (k) => k.major == effectiveKey,
-              )
+              value:
+                  CircleOfFifthsModel.defaultKeys.any(
+                    (k) => k.major == effectiveKey,
+                  )
                   ? effectiveKey
                   : CircleOfFifthsModel.defaultKeys.first.major,
               dropdownColor: colorScheme.surfaceContainerHighest,
@@ -371,8 +372,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           );
 
           final keySelector = Row(
-            mainAxisSize:
-                isCompact ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize: isCompact ? MainAxisSize.max : MainAxisSize.min,
             children: [
               Text(
                 labels.keyLabel,
@@ -382,9 +382,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
               ),
               const SizedBox(width: 8),
               if (isCompact)
-                Expanded(
-                  child: DropdownButtonHideUnderline(child: dropdownBox),
-                )
+                Expanded(child: DropdownButtonHideUnderline(child: dropdownBox))
               else
                 DropdownButtonHideUnderline(child: dropdownBox),
             ],
@@ -514,17 +512,13 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
               color: colorScheme.secondaryContainer.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              line.headerText ?? '',
-              style: sectionStyle,
-            ),
+            child: Text(line.headerText ?? '', style: sectionStyle),
           ),
         );
       case ChordSheetLineType.chordLyrics:
-        final hasAnyChord = widget.showChords &&
-            line.segments.any(
-              (s) => s.chord != null && s.chord!.isNotEmpty,
-            );
+        final hasAnyChord =
+            widget.showChords &&
+            line.segments.any((s) => s.chord != null && s.chord!.isNotEmpty);
 
         // When showChords is false, we can render pure Text spans for pixel-perfect
         // font line-height, text selection, and exact lyricStyle.height handling.
@@ -532,10 +526,7 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           final fullLineText = line.segments.map((s) => s.lyric).join();
           return Padding(
             padding: EdgeInsets.only(bottom: widget.lineSpacing),
-            child: Text(
-              fullLineText,
-              style: lyricStyle,
-            ),
+            child: Text(fullLineText, style: lyricStyle),
           );
         }
 
@@ -567,8 +558,18 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
     required TextStyle chordStyle,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasChord =
-        widget.showChords && segment.chord != null && segment.chord!.isNotEmpty;
+    final displayChords = widget.showChords
+        ? (segment.chords.isNotEmpty
+              ? segment.chords
+              : (segment.chord != null && segment.chord!.isNotEmpty
+                    ? [segment.chord!]
+                    : const <String>[]))
+        : const <String>[];
+    final hasChord = displayChords.isNotEmpty;
+    final badgeBackground =
+        widget.chordBackgroundColor ?? colorScheme.primaryContainer;
+    final badgeTextColor =
+        widget.chordStyle?.color ?? colorScheme.onPrimaryContainer;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -578,35 +579,69 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           hasChord
               ? Padding(
                   padding: EdgeInsets.only(bottom: widget.chordToLyricSpacing),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () => _handleChordTap(segment.chord!),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.chordBackgroundColor ??
-                            colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        segment.chord!,
-                        style: chordStyle.copyWith(
-                          color: widget.chordStyle?.color ??
-                              colorScheme.onPrimaryContainer,
+                  child: displayChords.length == 1
+                      ? InkWell(
+                          borderRadius: BorderRadius.circular(6),
+                          onTap: () => _handleChordTap(displayChords.first),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: badgeBackground,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              displayChords.first,
+                              style: chordStyle.copyWith(color: badgeTextColor),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeBackground,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for (
+                                int i = 0;
+                                i < displayChords.length;
+                                i++
+                              ) ...[
+                                if (i > 0)
+                                  Text(
+                                    '/',
+                                    style: chordStyle.copyWith(
+                                      color: badgeTextColor.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                    ),
+                                  ),
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(4),
+                                  onTap: () =>
+                                      _handleChordTap(displayChords[i]),
+                                  child: Text(
+                                    displayChords[i],
+                                    style: chordStyle.copyWith(
+                                      color: badgeTextColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                 )
               : SizedBox(height: 22 + widget.chordToLyricSpacing),
-        if (segment.lyric.isNotEmpty)
-          Text(
-            segment.lyric,
-            style: lyricStyle,
-          ),
+        if (segment.lyric.isNotEmpty) Text(segment.lyric, style: lyricStyle),
       ],
     );
   }

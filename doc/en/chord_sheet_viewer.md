@@ -41,7 +41,8 @@ And grace my fears re[D]lieved.
 
 * **Section Headers**: Lines matching labels such as `[Verse 1]`, `[Chorus]`, `[Intro]`, `[Bridge]` are styled using `sectionStyle`.
 * **Empty Lines**: Treated as stanza breaks and spaced according to `stanzaSpacing`.
-* **Slash Chords**: Supports compound/inverted bass chords like `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Slash Chords**: Supports inverted-bass slash chords like `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Compound / Passing Chords**: Supports `[D][/][F#m]`, `[D/F#m]`, `[Bm/][A]`, and `[Bm][/A]` syntax. All of them render together above the syllable as `D/F#m` or `Bm/A`, transpose each chord independently, and allow tapping either chord individually to inspect its diagram.
 
 ---
 

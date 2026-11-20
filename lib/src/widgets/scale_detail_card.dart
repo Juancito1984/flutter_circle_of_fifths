@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
@@ -122,7 +123,8 @@ class ScaleDetailCard extends StatelessWidget {
 
     final effectivePrimaryColor = primaryColor ?? colorScheme.primary;
     final effectiveSecondaryColor = secondaryColor ?? colorScheme.secondary;
-    final effectiveBgColor = backgroundColor ??
+    final effectiveBgColor =
+        backgroundColor ??
         (Theme.of(context).brightness == Brightness.dark
             ? colorScheme.surfaceContainerHigh
             : colorScheme.surfaceContainerLowest);
@@ -145,9 +147,7 @@ class ScaleDetailCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: effectiveBgColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: effectiveBorderColor,
-          ),
+          border: Border.all(color: effectiveBorderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,10 +187,10 @@ class ScaleDetailCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   onTap: enableChordTap
                       ? () => ChordInspectorSheet.show(
-                            context,
-                            chordSymbol: chordSymbol,
-                            labels: labels,
-                          )
+                          context,
+                          chordSymbol: chordSymbol,
+                          labels: labels,
+                        )
                       : null,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -216,7 +216,8 @@ class ScaleDetailCard extends StatelessWidget {
                             '${index + 1}',
                             style: textTheme.labelSmall?.copyWith(
                               fontSize: 10,
-                              color: primaryColor ??
+                              color:
+                                  primaryColor ??
                                   colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
                             ),
@@ -262,8 +263,8 @@ class ScaleDetailCard extends StatelessWidget {
                 height: 120,
                 preferFlats: model.keySignature.contains('b'),
                 rootKeyColor: primaryColor,
-                activeKeyColor: secondaryColor ??
-                    primaryColor?.withValues(alpha: 0.25),
+                activeKeyColor:
+                    secondaryColor ?? primaryColor?.withValues(alpha: 0.25),
                 activeBlackKeyColor: secondaryColor,
               ),
             ],

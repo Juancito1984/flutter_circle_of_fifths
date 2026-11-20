@@ -1,3 +1,14 @@
+## 2.0.1
+
+* **Corrección de Acordes Compuestos en `ChordSheetViewer` / `ChordSheetDocument` / `ChordTransposer`**:
+  * Se corrige el renderizado de secuencias con barra separadora como `[C][/][Am]`, `[D][/][F#m]`, `[Bm/][A]` y `[Bm][/A]`, evitando que `[/]`, `[Bm/]` o `[/A]` aparezcan mezclados dentro de la letra y mostrándolos agrupados sobre la sílaba (`C/Am`, `D/F#m`, `Bm/A`).
+  * Soporte directo para los cuatro formatos de entrada: `[D][/][F#m]`, `[D/F#m]`, `[Bm/][A]` y `[Bm][/A]` (manteniendo intactos los acordes con bajo invertido en un solo corchete como `[D/F#]`).
+  * Cada acorde del grupo se transpone de forma independiente al subir/bajar semitonos o cambiar de tonalidad, aparece por separado en la barra de acordes únicos y es tocable individualmente para abrir su diagrama en `ChordInspectorSheet`.
+  * Nuevo método [`ChordTransposer.splitCompoundChords`](lib/src/models/chord_model.dart) y propiedad [`ChordLyricSegment.chords`](lib/src/models/chord_sheet_parser.dart).
+* **Mejoras de Diseño Responsivo en `ChordSheetViewer`**:
+  * `_buildTranspositionToolbar` ahora ocupa todo el ancho disponible (`width: double.infinity`) y se adapta entre fila única en pantallas anchas y diseño compacto en dos filas para móviles.
+  * `_buildUniqueChordsBar` ubica la etiqueta en la parte superior y la lista desplazable de acordes en la parte inferior.
+
 ## 2.0.0
 
 > ⚠️ **Versión mayor con cambios incompatibles.** Ver la sección *Migración desde 1.x* al final de esta entrada.
