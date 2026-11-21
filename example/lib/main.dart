@@ -73,22 +73,47 @@ class _MainMusicStudioScreenState extends State<MainMusicStudioScreen> {
     }
   }
 
+
+  static const String _sampleSong = '''
+  {   Dm            F#m      C} 
+// Yo sé que estas aqui mi señor
+
+// Yo [Dm]sé que estas a[F]quí mi señ[C]or
+yo [Am]sé que estas a[Dm]quí //
+alienta mi [Gm]alma, alienta mi [F]alma, alienta mi [C]alma
+yo sé que estas aq[Dm]uí.
+
+// Necesito yo de [F]ti, mi señ[C]or
+[Am]necesito yo de [Dm]ti //
+alienta mi [Gm]alma, alienta mi [F]alma, alienta mi [C]alma
+yo [Am]sé que estas aq[Dm]uí.
+  
+  ''';
+
+  /*
   static const String _sampleSong = '''
 {title: Amazing Grace}
-{subtitle: Traditional Hymn - Arranged in ChordPro}
+{subtitle: Traditional Hymn - Inline, Compound & Braced Chords}
 {key: C}
+
+[Intro]
+{  C      Am     F      G}
 
 [Verse 1]
 [C]Amazing [C7]grace, how [F]sweet the [C]sound
-That [C]saved a [Am]wretch like [G7]me!
-I [C]once was [C7]lost, but [F]now am [C]found,
+That [C/E]saved a [Am]wretch like [G7]me!
+[C][/][Am]I once was [F/G7]lost, but [Dm/][G]now am [C][/Am]found,
 Was [Am]blind, but [G7]now I [C]see.
 
 [Chorus]
-'Twas [C]grace that [C/E]taught my [F]heart to [C]fear,
-And [Dm7]grace my [G7]fears re[C]lieved;
-How [C]precious [C7]did that [F]grace ap[Am]pear
-The [Dm7]hour I [G7]first be[C]lieved!
+{     C          C/E       F        C}
+'Twas grace that taught my heart to fear,
+{   Dm7      G7      C}
+And grace my fears relieved;
+{   C        C7       F       Am}
+How precious did that grace appear
+{   Dm7    G7      C}
+The hour I first believed!
 
 [Bridge]
 Through [F]many [C/E]dangers, [Dm7]toils and [C]snares
@@ -96,6 +121,8 @@ I [Am]have al[D7]ready [G7]come;
 'Tis [C]grace hath [C7]brought me [F]safe thus [C]far,
 And [Am]grace will [G7]lead me [C]home.
 ''';
+
+   */
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +252,7 @@ And [Am]grace will [G7]lead me [C]home.
       child: ChordSheetViewer(
         showChords: true,
         lineSpacing: 4,
-        stanzaSpacing: 20,
+        stanzaSpacing: 30,
         songText: _sampleSong,
         originalKey: 'C',
         defaultInstrument: InstrumentType.piano,

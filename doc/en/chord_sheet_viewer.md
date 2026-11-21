@@ -41,8 +41,18 @@ And grace my fears re[D]lieved.
 
 * **Section Headers**: Lines matching labels such as `[Verse 1]`, `[Chorus]`, `[Intro]`, `[Bridge]` are styled using `sectionStyle`.
 * **Empty Lines**: Treated as stanza breaks and spaced according to `stanzaSpacing`.
-* **Slash Chords**: Supports inverted-bass slash chords like `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Slash Chords**: Supports inverted-bass slash chords like `[C/G]`, `[D/F#]`, `[Am7/G]`, `[Dm/A]`.
 * **Compound / Passing Chords**: Supports `[D][/][F#m]`, `[D/F#m]`, `[Bm/][A]`, and `[Bm][/A]` syntax. All of them render together above the syllable as `D/F#m` or `Bm/A`, transpose each chord independently, and allow tapping either chord individually to inspect its diagram.
+* **Braced Chord-Over-Lyric Lines (`{ Chords }`)**: You can also place a chord-only line enclosed in curly braces directly above a lyric line to align each chord at its exact character column:
+
+```text
+{  Dm             F#m      C}
+Yo se que estás aquí mi señor
+{    Dm/A                F#m       C}
+Yo se que estás aquí mi señor
+```
+
+  Standalone instrumental lines (without a lyric line underneath) are also supported, and slash-bass chords (`Dm/A`) are automatically distinguished from compound chords (`D/F#m`).
 
 ---
 
@@ -66,6 +76,7 @@ And grace my fears re[D]lieved.
 | **`chordToLyricSpacing`** | `double` | `2.0` | Vertical distance between the bottom of the chord badge and the lyric syllable. |
 | **`wordSpacing`** | `double` | `4.0` | Horizontal spacing between word chunks in a line. |
 | **`lineRunSpacing`** | `double` | `8.0` | Vertical spacing between wrapped rows when a long line wraps physically. |
+| **`chordLineAlignment`** | `ChordLineAlignment` | `ChordLineAlignment.auto` | Alignment strategy for `{ Chords }` lines (`auto`, `characterColumn` for monospace editors, or `proportionalWidth` for proportional `TextField` editors). |
 | **`lyricStyle`** | `TextStyle?` | `fontSize: 16, height: 1.2` | Text style for song lyrics. |
 | **`chordStyle`** | `TextStyle?` | `fontSize: 13, bold, primaryColor` | Text style for chord badges. |
 | **`sectionStyle`** | `TextStyle?` | `fontSize: 13, bold, secondaryColor` | Text style for section headers (`[Intro]`, `[Chorus]`, etc.). |

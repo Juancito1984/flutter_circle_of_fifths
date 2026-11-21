@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:material_ui/material_ui.dart';
 
 import '../models/chord_model.dart';
@@ -83,6 +85,13 @@ class ChordSheetViewer extends StatefulWidget {
   /// Vertical spacing between chord badge and lyric text underneath.
   final double chordToLyricSpacing;
 
+  /// Alignment mode for braced chord-over-lyric lines (e.g. `{  Dm   F#m   C}`).
+  ///
+  /// Defaults to [ChordLineAlignment.auto], which automatically adapts between
+  /// monospace character-column alignment and proportional `TextField` visual
+  /// width alignment.
+  final ChordLineAlignment chordLineAlignment;
+
   /// Creates a [ChordSheetViewer] widget.
   const ChordSheetViewer({
     super.key,
@@ -107,6 +116,7 @@ class ChordSheetViewer extends StatefulWidget {
     this.lineSpacing = 8.0,
     this.stanzaSpacing = 16.0,
     this.chordToLyricSpacing = 2.0,
+    this.chordLineAlignment = ChordLineAlignment.auto,
   });
 
   @override
@@ -203,12 +213,6 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
             ? ChordTransposer.transposeChord(widget.originalKey!, _semitones)
             : null);
 
-    final doc = ChordSheetDocument.parse(
-      widget.songText,
-      transposeSemitones: _semitones,
-      targetKey: effectiveKey,
-    );
-
     final defaultLyricStyle =
         widget.lyricStyle ??
         textTheme.bodyLarge?.copyWith(
@@ -216,6 +220,28 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
           height: 1.35,
         ) ??
         const TextStyle(fontSize: 16);
+
+    final textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    final widthCache = <String, double>{};
+    double measureLyricWidth(String text) {
+      return widthCache.putIfAbsent(text, () {
+        if (text.isEmpty) return 0.0;
+        final painter = TextPainter(
+          text: TextSpan(text: text, style: defaultLyricStyle),
+          textDirection: textDirection,
+          maxLines: 1,
+        )..layout();
+        return painter.width;
+      });
+    }
+
+    final doc = ChordSheetDocument.parse(
+      widget.songText,
+      transposeSemitones: _semitones,
+      targetKey: effectiveKey,
+      chordLineAlignment: widget.chordLineAlignment,
+      measureTextWidth: measureLyricWidth,
+    );
 
     final defaultChordStyle =
         widget.chordStyle ??
@@ -518,131 +544,373 @@ class _ChordSheetViewerState extends State<ChordSheetViewer> {
       case ChordSheetLineType.chordLyrics:
         final hasAnyChord =
             widget.showChords &&
-            line.segments.any((s) => s.chord != null && s.chord!.isNotEmpty);
+            line.segments.any(
+              (s) =>
+                  s.chords.isNotEmpty ||
+                  (s.chord != null && s.chord!.isNotEmpty),
+            );
+        final fullLineText = line.segments.map((s) => s.lyric).join();
 
-        // When showChords is false, we can render pure Text spans for pixel-perfect
-        // font line-height, text selection, and exact lyricStyle.height handling.
-        if (!widget.showChords) {
-          final fullLineText = line.segments.map((s) => s.lyric).join();
+        // When showChords is false or the line has no chords, render pure Text
+        // for pixel-perfect font spacing, line-height, and text selection.
+        if (!widget.showChords || !hasAnyChord) {
+          if (fullLineText.isEmpty) {
+            return const SizedBox.shrink();
+          }
           return Padding(
             padding: EdgeInsets.only(bottom: widget.lineSpacing),
             child: Text(fullLineText, style: lyricStyle),
           );
         }
 
+        // Standalone chord-only line (e.g. instrumental intro/interlude)
+        if (fullLineText.isEmpty) {
+          final chordSegments = line.segments
+              .where((s) => _chordsForSegment(s).isNotEmpty)
+              .toList();
+          return Padding(
+            padding: EdgeInsets.only(bottom: widget.lineSpacing),
+            child: Wrap(
+              spacing: math.max(6.0, widget.wordSpacing),
+              runSpacing: widget.lineRunSpacing,
+              children: [
+                for (final segment in chordSegments)
+                  _buildChordBadge(
+                    context,
+                    _chordsForSegment(segment),
+                    chordStyle: chordStyle,
+                  ),
+              ],
+            ),
+          );
+        }
+
         return Padding(
           padding: EdgeInsets.only(bottom: widget.lineSpacing),
-          child: Wrap(
-            spacing: widget.wordSpacing,
-            runSpacing: widget.lineRunSpacing,
-            crossAxisAlignment: WrapCrossAlignment.end,
-            children: line.segments.map((segment) {
-              return _buildSegment(
-                context,
-                segment,
-                hasAnyChordInLine: hasAnyChord,
-                lyricStyle: lyricStyle,
-                chordStyle: chordStyle,
-              );
-            }).toList(),
+          child: _buildAlignedChordLyricLine(
+            context,
+            line.segments,
+            fullLineText: fullLineText,
+            lyricStyle: lyricStyle,
+            chordStyle: chordStyle,
           ),
         );
     }
   }
 
-  Widget _buildSegment(
+  List<String> _chordsForSegment(ChordLyricSegment segment) {
+    if (!widget.showChords) return const [];
+    if (segment.chords.isNotEmpty) return segment.chords;
+    if (segment.chord != null && segment.chord!.isNotEmpty) {
+      return [segment.chord!];
+    }
+    return const [];
+  }
+
+  Widget _buildAlignedChordLyricLine(
     BuildContext context,
-    ChordLyricSegment segment, {
-    required bool hasAnyChordInLine,
+    List<ChordLyricSegment> segments, {
+    required String fullLineText,
     required TextStyle lyricStyle,
     required TextStyle chordStyle,
   }) {
+    final textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
+
+    // Collect each chord anchor with its exact character offset in fullLineText.
+    final anchors = <({int charIndex, List<String> chords})>[];
+    var runningOffset = 0;
+    for (final segment in segments) {
+      final chords = _chordsForSegment(segment);
+      if (chords.isNotEmpty) {
+        anchors.add((charIndex: runningOffset, chords: chords));
+      }
+      runningOffset += segment.lyric.length;
+    }
+
+    // Measure standard badge height from chordStyle so any font size fits cleanly.
+    final badgeMetricsPainter = TextPainter(
+      text: TextSpan(text: 'Mg', style: chordStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+    )..layout();
+    final badgeHeight = badgeMetricsPainter.height + 4.0;
+
+    final badgeWidthCache = <String, double>{};
+    double measureBadgeWidth(List<String> chords) {
+      final label = chords.join('/');
+      return badgeWidthCache.putIfAbsent(label, () {
+        final painter = TextPainter(
+          text: TextSpan(text: label, style: chordStyle),
+          textDirection: textDirection,
+          maxLines: 1,
+        )..layout();
+        // Horizontal padding 6 + 6 = 12, plus slight rounding margin
+        return painter.width + 13.0;
+      });
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 10000.0;
+
+        final fullPainter = TextPainter(
+          text: TextSpan(text: fullLineText, style: lyricStyle),
+          textDirection: textDirection,
+        )..layout(maxWidth: maxWidth);
+
+        final wrappedRanges = <({int start, int end})>[];
+        var offset = 0;
+        while (offset < fullLineText.length) {
+          final boundary = fullPainter.getLineBoundary(
+            TextPosition(offset: offset),
+          );
+          var start = boundary.start;
+          var end = boundary.end;
+          if (start < offset) start = offset;
+          if (end <= start) {
+            end = math.min(fullLineText.length, start + 1);
+          }
+          wrappedRanges.add((start: start, end: end));
+          offset = end;
+        }
+
+        if (wrappedRanges.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (
+              var lineIdx = 0;
+              lineIdx < wrappedRanges.length;
+              lineIdx++
+            ) ...[
+              if (lineIdx > 0) SizedBox(height: widget.lineRunSpacing),
+              _buildPhysicalChordLyricSubLine(
+                context,
+                subText: fullLineText.substring(
+                  wrappedRanges[lineIdx].start,
+                  wrappedRanges[lineIdx].end,
+                ),
+                isLastWrappedLine: lineIdx == wrappedRanges.length - 1,
+                lineStartOffset: wrappedRanges[lineIdx].start,
+                lineEndOffset: wrappedRanges[lineIdx].end,
+                fullLength: fullLineText.length,
+                allAnchors: anchors,
+                maxWidth: maxWidth,
+                textDirection: textDirection,
+                lyricStyle: lyricStyle,
+                chordStyle: chordStyle,
+                badgeHeight: badgeHeight,
+                measureBadgeWidth: measureBadgeWidth,
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPhysicalChordLyricSubLine(
+    BuildContext context, {
+    required String subText,
+    required bool isLastWrappedLine,
+    required int lineStartOffset,
+    required int lineEndOffset,
+    required int fullLength,
+    required List<({int charIndex, List<String> chords})> allAnchors,
+    required double maxWidth,
+    required TextDirection textDirection,
+    required TextStyle lyricStyle,
+    required TextStyle chordStyle,
+    required double badgeHeight,
+    required double Function(List<String> chords) measureBadgeWidth,
+  }) {
+    final lineAnchors = <({int subIndex, List<String> chords})>[];
+    for (final a in allAnchors) {
+      if (a.charIndex >= lineStartOffset && a.charIndex < lineEndOffset) {
+        lineAnchors.add((
+          subIndex: a.charIndex - lineStartOffset,
+          chords: a.chords,
+        ));
+      } else if (isLastWrappedLine && a.charIndex >= fullLength) {
+        lineAnchors.add((subIndex: subText.length, chords: a.chords));
+      }
+    }
+
+    final displaySubText = isLastWrappedLine ? subText : subText.trimRight();
+    if (lineAnchors.isEmpty) {
+      return Text(displaySubText, style: lyricStyle);
+    }
+
+    double measureSubWidth(int endIndex) {
+      final safeEnd = endIndex.clamp(0, displaySubText.length);
+      if (safeEnd == 0) return 0.0;
+      final painter = TextPainter(
+        text: TextSpan(
+          text: displaySubText.substring(0, safeEnd),
+          style: lyricStyle,
+        ),
+        textDirection: textDirection,
+        maxLines: 1,
+      )..layout();
+      return painter.width;
+    }
+
+    const minChordGap = 4.0;
+    final gapAtSubIndex = <int, double>{};
+    final placedChords = <({double x, List<String> chords})>[];
+
+    var prevRight = -double.infinity;
+    var accumulatedGap = 0.0;
+
+    for (var i = 0; i < lineAnchors.length; i++) {
+      final anchor = lineAnchors[i];
+      final badgeW = measureBadgeWidth(anchor.chords);
+      final isTrailingAfterText = anchor.subIndex >= displaySubText.length;
+      final baseRawX = measureSubWidth(anchor.subIndex);
+      var desiredX = baseRawX + accumulatedGap;
+
+      if (isTrailingAfterText) {
+        desiredX = math.max(
+          desiredX + math.max(4.0, widget.wordSpacing),
+          prevRight + minChordGap,
+        );
+      } else if (desiredX < prevRight + minChordGap) {
+        final extraGap = (prevRight + minChordGap) - desiredX;
+        gapAtSubIndex[anchor.subIndex] =
+            (gapAtSubIndex[anchor.subIndex] ?? 0.0) + extraGap;
+        accumulatedGap += extraGap;
+        desiredX = prevRight + minChordGap;
+      }
+
+      // Keep the last chord from clipping past the right edge when space allows.
+      if (i == lineAnchors.length - 1 &&
+          desiredX + badgeW > maxWidth &&
+          maxWidth - badgeW >= prevRight + minChordGap) {
+        desiredX = math.max(prevRight + minChordGap, maxWidth - badgeW);
+      }
+
+      placedChords.add((x: desiredX, chords: anchor.chords));
+      prevRight = desiredX + badgeW;
+    }
+
+    final spans = <InlineSpan>[];
+    if (gapAtSubIndex.isEmpty) {
+      spans.add(TextSpan(text: displaySubText, style: lyricStyle));
+    } else {
+      final sortedIndices = gapAtSubIndex.keys.toList()..sort();
+      var cursor = 0;
+      for (final idx in sortedIndices) {
+        final safeIdx = idx.clamp(0, displaySubText.length);
+        if (safeIdx > cursor) {
+          spans.add(
+            TextSpan(
+              text: displaySubText.substring(cursor, safeIdx),
+              style: lyricStyle,
+            ),
+          );
+          cursor = safeIdx;
+        }
+        spans.add(WidgetSpan(child: SizedBox(width: gapAtSubIndex[idx]!)));
+      }
+      if (cursor < displaySubText.length) {
+        spans.add(
+          TextSpan(text: displaySubText.substring(cursor), style: lyricStyle),
+        );
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: badgeHeight,
+          width: double.infinity,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              for (final placed in placedChords)
+                Positioned(
+                  left: placed.x,
+                  top: 0,
+                  child: _buildChordBadge(
+                    context,
+                    placed.chords,
+                    chordStyle: chordStyle,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(height: widget.chordToLyricSpacing),
+        Text.rich(TextSpan(children: spans)),
+      ],
+    );
+  }
+
+  Widget _buildChordBadge(
+    BuildContext context,
+    List<String> displayChords, {
+    required TextStyle chordStyle,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
-    final displayChords = widget.showChords
-        ? (segment.chords.isNotEmpty
-              ? segment.chords
-              : (segment.chord != null && segment.chord!.isNotEmpty
-                    ? [segment.chord!]
-                    : const <String>[]))
-        : const <String>[];
-    final hasChord = displayChords.isNotEmpty;
     final badgeBackground =
         widget.chordBackgroundColor ?? colorScheme.primaryContainer;
     final badgeTextColor =
         widget.chordStyle?.color ?? colorScheme.onPrimaryContainer;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (hasAnyChordInLine)
-          hasChord
-              ? Padding(
-                  padding: EdgeInsets.only(bottom: widget.chordToLyricSpacing),
-                  child: displayChords.length == 1
-                      ? InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: () => _handleChordTap(displayChords.first),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: badgeBackground,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              displayChords.first,
-                              style: chordStyle.copyWith(color: badgeTextColor),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: badgeBackground,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              for (
-                                int i = 0;
-                                i < displayChords.length;
-                                i++
-                              ) ...[
-                                if (i > 0)
-                                  Text(
-                                    '/',
-                                    style: chordStyle.copyWith(
-                                      color: badgeTextColor.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                    ),
-                                  ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(4),
-                                  onTap: () =>
-                                      _handleChordTap(displayChords[i]),
-                                  child: Text(
-                                    displayChords[i],
-                                    style: chordStyle.copyWith(
-                                      color: badgeTextColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                )
-              : SizedBox(height: 22 + widget.chordToLyricSpacing),
-        if (segment.lyric.isNotEmpty) Text(segment.lyric, style: lyricStyle),
-      ],
+    if (displayChords.length == 1) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => _handleChordTap(displayChords.first),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: badgeBackground,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            displayChords.first,
+            style: chordStyle.copyWith(color: badgeTextColor),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: badgeBackground,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (int i = 0; i < displayChords.length; i++) ...[
+            if (i > 0)
+              Text(
+                '/',
+                style: chordStyle.copyWith(
+                  color: badgeTextColor.withValues(alpha: 0.7),
+                ),
+              ),
+            InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () => _handleChordTap(displayChords[i]),
+              child: Text(
+                displayChords[i],
+                style: chordStyle.copyWith(color: badgeTextColor),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../models/chord_model.dart';
 import '../models/circle_of_fifths_model.dart';
 import '../theme/circle_of_fifths_labels.dart';
 import 'chord_inspector_sheet.dart';
@@ -19,6 +20,9 @@ class ScaleDetailCard extends StatelessWidget {
 
   /// Whether tapping a scale degree opens [ChordInspectorSheet] for that degree's chord.
   final bool enableChordTap;
+
+  /// Default instrument tab when opening [ChordInspectorSheet] on degree tap.
+  final InstrumentType defaultInstrument;
 
   /// Custom localization labels.
   final CircleOfFifthsLabels labels;
@@ -46,6 +50,7 @@ class ScaleDetailCard extends StatelessWidget {
     this.isMinorMode = false,
     this.showPianoScale = false,
     this.enableChordTap = true,
+    this.defaultInstrument = InstrumentType.guitar,
     this.labels = const CircleOfFifthsLabels(),
     this.backgroundColor,
     this.primaryColor,
@@ -189,6 +194,7 @@ class ScaleDetailCard extends StatelessWidget {
                       ? () => ChordInspectorSheet.show(
                           context,
                           chordSymbol: chordSymbol,
+                          initialInstrument: defaultInstrument,
                           labels: labels,
                         )
                       : null,

@@ -27,6 +27,7 @@ El widget **`ScaleDetailCard`** es una tarjeta informativa completa y modular qu
 | **`isMinorMode`** | `bool` | `false` | Indica si se debe mostrar la escala Mayor (`false`) o la escala Menor Relativa (`true`). |
 | **`showPianoScale`** | `bool` | `false` | Renderiza un teclado visual interactivo de piano resaltando las notas de la escala. |
 | **`enableChordTap`** | `bool` | `true` | Habilita pulsar los grados para inspeccionar sus diagramas de digitaciones en instrumentos. |
+| **`defaultInstrument`** | `InstrumentType` | `InstrumentType.guitar` | Instrumento seleccionado por defecto al abrir el inspector modal (`guitar`, `ukulele`, `piano`). |
 | **`labels`** | `CircleOfFifthsLabels` | `CircleOfFifthsLabels()` | Textos y traducciones para encabezados (ej: `labels.scaleFormula`, `labels.degreeNumbers`). |
 | **`backgroundColor`** | `Color?` | `null` | Color de fondo de la tarjeta. Por defecto se adapta dinámicamente según el brillo del tema (`surfaceContainerLowest` en claro, `surfaceContainerHigh` en oscuro). |
 | **`primaryColor`** | `Color?` | `null` | Color de acento primario para el título, nombres de notas y tónica. Por defecto usa `colorScheme.primary`. |

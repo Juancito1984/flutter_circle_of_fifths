@@ -460,5 +460,262 @@ That [C]saved a [G7]wretch like [C]me
         expect(find.text('A#'), findsNWidgets(2));
       },
     );
+
+    test('ChordSheetDocument parses braced chord-over-lyric lines aligned by column and distinguishes slash-bass chords', () {
+      const song = '''
+{  Dm             F#m      C}
+Yo se que estás aquí mi señor
+{   A             Dm} 
+Yo se que estas aquí
+
+{    Dm/A                F#m       C}
+Yo se que estás aquí mi señor
+
+[Intro]
+{  Dm    F#m    C}
+''';
+
+      final doc = ChordSheetDocument.parse(song);
+      expect(doc.uniqueChords, ['Dm', 'F#m', 'C', 'A', 'Dm/A']);
+
+      // Line 0: {  Dm             F#m      C} + Yo se que estás aquí mi señor
+      final line0 = doc.lines[0];
+      expect(line0.type, ChordSheetLineType.chordLyrics);
+      expect(
+        line0.segments.map((s) => s.lyric).join(),
+        'Yo se que estás aquí mi señor',
+      );
+      final dmSeg = line0.segments.firstWhere((s) => s.chord == 'Dm');
+      final fSharpMSeg = line0.segments.firstWhere((s) => s.chord == 'F#m');
+      final cSeg = line0.segments.firstWhere((s) => s.chord == 'C');
+      expect(dmSeg.lyric, 'se ');
+      expect(fSharpMSeg.lyric, 'uí ');
+      expect(cSeg.lyric, 'or');
+
+      // Line 1: {   A             Dm}  + Yo se que estas aquí
+      final line1 = doc.lines[1];
+      expect(line1.segments.map((s) => s.lyric).join(), 'Yo se que estas aquí');
+      final aSeg = line1.segments.firstWhere((s) => s.chord == 'A');
+      final dm2Seg = line1.segments.firstWhere((s) => s.chord == 'Dm');
+      expect(aSeg.lyric, 'e ');
+      expect(dm2Seg.lyric, 'uí');
+
+      // Line 3: {    Dm/A                F#m       C} + Yo se que estás aquí mi señor
+      // In auto mode, proportional width maps Dm/A -> se, F#m -> quí, C -> ñor
+      final line3 = doc.lines[3];
+      final slashBassSeg = line3.segments.firstWhere((s) => s.chord == 'Dm/A');
+      expect(slashBassSeg.chords, ['Dm/A']);
+      expect(slashBassSeg.lyric, 'se ');
+      final fSharpM3Seg = line3.segments.firstWhere((s) => s.chord == 'F#m');
+      expect(fSharpM3Seg.lyric, contains('uí'));
+      final c3Seg = line3.segments.firstWhere((s) => s.chord == 'C');
+      expect(c3Seg.lyric, contains('or'));
+
+      // Explicit characterColumn mode preserves raw character column mapping
+      final charColDoc = ChordSheetDocument.parse(
+        '{    Dm/A                F#m       C}\nYo se que estás aquí mi señor',
+        chordLineAlignment: ChordLineAlignment.characterColumn,
+      );
+      final charColTrailingC = charColDoc.lines.first.segments.firstWhere(
+        (s) => s.chord == 'C',
+      );
+      expect(charColTrailingC.lyric, '');
+
+      // Proportional TextField alignment (wide spaces + narrow proportional chars)
+      final propDoc = ChordSheetDocument.parse(
+        '{        Dm                    F#m         C}\n// Yo sé que estas aqui mi señor',
+      );
+      final propLine = propDoc.lines.first;
+      expect(propLine.segments.firstWhere((s) => s.chord == 'Dm').lyric, 'sé ');
+      expect(
+        propLine.segments.firstWhere((s) => s.chord == 'F#m').lyric,
+        contains('ui'),
+      );
+      expect(
+        propLine.segments.firstWhere((s) => s.chord == 'C').lyric,
+        contains('or'),
+      );
+
+      // Standalone instrumental braced chord line
+      final introChordsLine = doc.lines[6];
+      expect(introChordsLine.type, ChordSheetLineType.chordLyrics);
+      expect(introChordsLine.segments.map((s) => s.chord).toList(), [
+        'Dm',
+        'F#m',
+        'C',
+      ]);
+      expect(introChordsLine.segments.every((s) => s.lyric.isEmpty), isTrue);
+
+      // Transposition +2 semitones preserves Dm/A as a single slash-bass chord
+      final transposedDoc = ChordSheetDocument.parse(
+        '{    Dm/A                F#m       C}\nYo se que estás aquí mi señor',
+        transposeSemitones: 2,
+      );
+      expect(transposedDoc.uniqueChords, ['Em/B', 'G#m', 'D']);
+
+      expect(
+        ChordTransposer.transposeLyrics(
+          '{  Dm             F#m      C}\nYo se que estás aquí mi señor',
+          2,
+        ),
+        '{  Em             G#m      D}\nYo se que estás aquí mi señor',
+      );
+    });
+
+    testWidgets(
+      'ChordSheetViewer renders braced chord lines above exact lyric matches, aligns trailing chords on top row, handles Dm/A slash bass, and hides chord-only lines when showChords is false',
+      (tester) async {
+        ChordInfo? tappedChord;
+        const songText = '''
+[Intro]
+{  Dm    F#m    C}
+
+{    Dm/A                F#m       C}
+Yo se que estás aquí mi señor
+''';
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(
+                  songText: songText,
+                  originalKey: 'D',
+                  showChordSummaryBar: false,
+                  showDiagramModalOnTap: false,
+                  onTapChord: (info) => tappedChord = info,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Dm/A'), findsOneWidget);
+        expect(find.text('F#m'), findsNWidgets(2));
+        expect(find.text('C'), findsNWidgets(2));
+        expect(find.text('{  Dm    F#m    C}'), findsNothing);
+
+        // Trailing 'C' in lyric line must sit at the same vertical Y as 'Dm/A' and 'F#m'
+        final dmAY = tester.getTopLeft(find.text('Dm/A')).dy;
+        final trailingCY = tester.getTopLeft(find.text('C').last).dy;
+        expect((trailingCY - dmAY).abs(), lessThan(2.0));
+
+        // Tapping Dm/A passes root=D, quality=m, bassNote=A
+        await tester.tap(find.text('Dm/A'));
+        expect(tappedChord?.symbol, 'Dm/A');
+        expect(tappedChord?.root, 'D');
+        expect(tappedChord?.quality, 'm');
+        expect(tappedChord?.bassNote, 'A');
+
+        // Transpose +2 semitones: Dm/A -> Em/B, F#m -> G#m, C -> D
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('+1 Semitone'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Em/B'), findsOneWidget);
+        expect(find.text('G#m'), findsNWidgets(2));
+        expect(find.text('D'), findsNWidgets(2));
+
+        // Verify showChords: false hides chord-only lines and renders clean lyrics
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ChordSheetViewer(songText: songText, showChords: false),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Dm/A'), findsNothing);
+        expect(find.text('Yo se que estás aquí mi señor'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'ChordSheetViewer keeps natural continuous word spacing when chords do not collide, separates colliding chords, and wraps long lines cleanly',
+      (tester) async {
+        const songText = '''
+// Yo [Dm]sé que estas a[F]quí mi señ[C]or
+[C]a[G]b
+Esta es una línea larga que se envuelve [Dm]cuando el ancho de pantalla es [G]pequeño
+''';
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: SizedBox(
+                  width: 640,
+                  child: ChordSheetViewer(
+                    songText: songText,
+                    showTranspositionBar: false,
+                    showChordSummaryBar: false,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Non-colliding lyric line renders as continuous natural text without extra word gaps
+        expect(
+          find.text('// Yo sé que estas aquí mi señor', findRichText: true),
+          findsOneWidget,
+        );
+
+        // Adjacent colliding chords [C]a[G]b are separated horizontally without overlapping
+        final cRight = tester.getTopRight(find.text('C').at(1)).dx;
+        final gLeft = tester.getTopLeft(find.text('G').first).dx;
+        expect(gLeft, greaterThan(cRight));
+
+        // Narrow width wraps long lines cleanly with chords still aligned
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: SizedBox(
+                  width: 240,
+                  child: ChordSheetViewer(
+                    songText: songText,
+                    showTranspositionBar: false,
+                    showChordSummaryBar: false,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Dm'), findsNWidgets(2));
+        expect(find.text('G'), findsNWidgets(2));
+      },
+    );
+
+    testWidgets(
+      'ScaleDetailCard opens ChordInspectorSheet with configured defaultInstrument',
+      (tester) async {
+        final cMajor = CircleOfFifthsModel.defaultKeys[0];
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ScaleDetailCard(
+                model: cMajor,
+                defaultInstrument: InstrumentType.piano,
+              ),
+            ),
+          ),
+        );
+
+        // Tap the first degree ('C') to open ChordInspectorSheet
+        await tester.tap(find.text('C').first);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ChordInspectorSheet), findsOneWidget);
+        expect(find.byType(PianoKeybedWidget), findsOneWidget);
+      },
+    );
   });
 }

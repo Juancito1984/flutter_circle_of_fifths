@@ -27,6 +27,7 @@ The **`ScaleDetailCard`** widget is a comprehensive theoretical breakdown card t
 | **`isMinorMode`** | `bool` | `false` | Whether to display the Major scale (`false`) or the Relative Minor scale (`true`). |
 | **`showPianoScale`** | `bool` | `false` | Whether to render an interactive piano keyboard highlighting scale notes. |
 | **`enableChordTap`** | `bool` | `true` | Enables tapping scale degrees to inspect their chord diagrams in instruments. |
+| **`defaultInstrument`** | `InstrumentType` | `InstrumentType.guitar` | Default instrument tab displayed when opening the chord inspector modal (`guitar`, `ukulele`, `piano`). |
 | **`labels`** | `CircleOfFifthsLabels` | `CircleOfFifthsLabels()` | Localization instance for section headers and degree descriptions. |
 | **`backgroundColor`** | `Color?` | `null` | Background color for the card container. Automatically adapts to brightness (`surfaceContainerLowest` in light, `surfaceContainerHigh` in dark). |
 | **`primaryColor`** | `Color?` | `null` | Primary accent color for title, note names, and tonic highlights. Defaults to `colorScheme.primary`. |

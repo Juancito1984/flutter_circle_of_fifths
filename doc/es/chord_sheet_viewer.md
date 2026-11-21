@@ -41,8 +41,18 @@ And grace my fears re[D]lieved.
 
 * **Encabezados de sección**: Las líneas que contengan etiquetas como `[Verse 1]`, `[Chorus]`, `[Intro]`, `[Bridge]` se formatean automáticamente con `sectionStyle`.
 * **Líneas vacías**: Representan separación entre estrofas y aplican el espaciado definido por `stanzaSpacing`.
-* **Acordes con bajo invertido (Slash Chords)**: Soporta acordes con bajo en otra nota como `[C/G]`, `[D/F#]`, `[Am7/G]`.
+* **Acordes con bajo invertido (Slash Chords)**: Soporta acordes con bajo en otra nota como `[C/G]`, `[D/F#]`, `[Am7/G]`, `[Dm/A]`.
 * **Acordes compuestos / de paso**: Soporta los formatos `[D][/][F#m]`, `[D/F#m]`, `[Bm/][A]` y `[Bm][/A]`. Todos se muestran juntos sobre la sílaba como `D/F#m` o `Bm/A`, transponen cada acorde por separado y permiten tocar cualquiera de los dos para ver su diagrama.
+* **Líneas de acordes sobre la letra (`{ Acordes }`)**: También puedes escribir una línea solo de acordes entre llaves encima de la línea de letra para alinearlos exactamente por columna:
+
+```text
+{  Dm             F#m      C}
+Yo se que estás aquí mi señor
+{    Dm/A                F#m       C}
+Yo se que estás aquí mi señor
+```
+
+  También admite líneas instrumentales independientes (por ejemplo en `[Intro]` sin letra debajo) y distingue automáticamente acordes con bajo (`Dm/A`) de acordes compuestos (`D/F#m`).
 
 ---
 
@@ -66,6 +76,7 @@ And grace my fears re[D]lieved.
 | **`chordToLyricSpacing`** | `double` | `2.0` | Distancia vertical entre la parte inferior de la pastilla del acorde y la sílaba de la letra. |
 | **`wordSpacing`** | `double` | `4.0` | Espaciado horizontal entre palabras o bloques de acorde-letra en la misma línea. |
 | **`lineRunSpacing`** | `double` | `8.0` | Espaciado vertical si un verso muy largo debe envolverse (*wrap*) en la siguiente línea física de la pantalla. |
+| **`chordLineAlignment`** | `ChordLineAlignment` | `ChordLineAlignment.auto` | Estrategia de alineación para líneas `{ Acordes }` (`auto`, `characterColumn` para fuentes monoespaciadas o `proportionalWidth` para editores proporcionales como `TextField`). |
 | **`lyricStyle`** | `TextStyle?` | `fontSize: 16, height: 1.2` | Estilo tipográfico para las letras de la canción. |
 | **`chordStyle`** | `TextStyle?` | `fontSize: 13, bold, primaryColor` | Estilo tipográfico para las pastillas y nombres de los acordes. |
 | **`sectionStyle`** | `TextStyle?` | `fontSize: 13, bold, secondaryColor` | Estilo para títulos de secciones (`[Intro]`, `[Chorus]`, etc.). |

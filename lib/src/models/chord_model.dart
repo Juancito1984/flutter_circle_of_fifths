@@ -293,7 +293,8 @@ class ChordTransposer {
     return '$newRoot$quality';
   }
 
-  /// Transposes all bracketed chords (e.g., `[C]Amazing [F]grace`) inside [chordProText].
+  /// Transposes all bracketed chords (e.g., `[C]Amazing [F]grace`) and
+  /// braced chord-only lines (e.g., `{  Dm  F#m  C}`) inside [chordProText].
   static String transposeLyrics(
     String chordProText,
     int semitones, {
@@ -303,29 +304,113 @@ class ChordTransposer {
     if (semitones == 0 && targetKey == null && preferFlats == null) {
       return chordProText;
     }
-    return chordProText.replaceAllMapped(RegExp(r'\[([^\[\]]+)\]'), (match) {
-      final content = match.group(1)!;
-      final trimmed = content.trim();
-      final leadingSlash = trimmed.startsWith('/');
-      final trailingSlash = trimmed.length > 1 && trimmed.endsWith('/');
-      final stripped = trimmed
-          .replaceFirst(RegExp(r'^/'), '')
-          .replaceFirst(RegExp(r'/$'), '')
-          .trim();
 
-      if (stripped.isEmpty || splitCompoundChords(stripped).isEmpty) {
-        return match.group(0)!;
-      }
-      final transposed = transposeChord(
-        stripped,
+    final lineEnding = chordProText.contains('\r\n') ? '\r\n' : '\n';
+    final lines = chordProText.replaceAll('\r\n', '\n').split('\n');
+
+    final transposedLines = lines.map((line) {
+      final braced = _transposeBracedChordLineIfValid(
+        line,
         semitones,
         preferFlats: preferFlats,
         targetKey: targetKey,
       );
-      final prefix = leadingSlash ? '/' : '';
-      final suffix = trailingSlash ? '/' : '';
-      return '[$prefix$transposed$suffix]';
+      if (braced != null) {
+        return braced;
+      }
+
+      return line.replaceAllMapped(RegExp(r'\[([^\[\]]+)\]'), (match) {
+        final content = match.group(1)!;
+        final trimmed = content.trim();
+        final leadingSlash = trimmed.startsWith('/');
+        final trailingSlash = trimmed.length > 1 && trimmed.endsWith('/');
+        final stripped = trimmed
+            .replaceFirst(RegExp(r'^/'), '')
+            .replaceFirst(RegExp(r'/$'), '')
+            .trim();
+
+        if (stripped.isEmpty || splitCompoundChords(stripped).isEmpty) {
+          return match.group(0)!;
+        }
+        final transposed = transposeChord(
+          stripped,
+          semitones,
+          preferFlats: preferFlats,
+          targetKey: targetKey,
+        );
+        final prefix = leadingSlash ? '/' : '';
+        final suffix = trailingSlash ? '/' : '';
+        return '[$prefix$transposed$suffix]';
+      });
     });
+
+    return transposedLines.join(lineEnding);
+  }
+
+  static String? _transposeBracedChordLineIfValid(
+    String line,
+    int semitones, {
+    bool? preferFlats,
+    String? targetKey,
+  }) {
+    final trimmed = line.trim();
+    if (!trimmed.startsWith('{') ||
+        !trimmed.endsWith('}') ||
+        trimmed.contains(':')) {
+      return null;
+    }
+
+    final openIndex = line.indexOf('{');
+    final closeIndex = line.lastIndexOf('}');
+    if (closeIndex <= openIndex + 1) return null;
+
+    final inner = line.substring(openIndex + 1, closeIndex);
+    final matches = RegExp(r'\S+').allMatches(inner).toList();
+    if (matches.isEmpty) return null;
+
+    for (final m in matches) {
+      if (splitCompoundChords(m.group(0)!).isEmpty) {
+        return null;
+      }
+    }
+
+    final buffer = StringBuffer();
+    buffer.write(line.substring(0, openIndex + 1));
+
+    var cursor = 0;
+    var columnDelta = 0;
+
+    for (var i = 0; i < matches.length; i++) {
+      final m = matches[i];
+      final rawGap = inner.substring(cursor, m.start);
+      if (i == 0) {
+        buffer.write(rawGap);
+      } else {
+        final adjustedSpaces = rawGap.length - columnDelta;
+        final safeSpaces = adjustedSpaces >= 1 ? adjustedSpaces : 1;
+        columnDelta = safeSpaces - adjustedSpaces;
+        buffer.write(' ' * safeSpaces);
+      }
+
+      final token = m.group(0)!;
+      final transposed = transposeChord(
+        token,
+        semitones,
+        preferFlats: preferFlats,
+        targetKey: targetKey,
+      );
+      buffer.write(transposed);
+      columnDelta += transposed.length - token.length;
+      cursor = m.end;
+    }
+
+    final trailingInner = inner.substring(cursor);
+    if (trailingInner.isNotEmpty) {
+      final adjustedTrailing = trailingInner.length - columnDelta;
+      buffer.write(adjustedTrailing > 0 ? ' ' * adjustedTrailing : '');
+    }
+    buffer.write(line.substring(closeIndex));
+    return buffer.toString();
   }
 
   /// Splits a token into individual chord symbols when it represents multiple
